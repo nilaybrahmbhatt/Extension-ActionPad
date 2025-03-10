@@ -1,70 +1,197 @@
-.App {
-  text-align: center;
-  font-family: sans-serif;
-  padding: 20px;
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+/* ./src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Roboto", sans-serif;
+  }
 }
 
-.App.night-mode {
-  background-color: #333;
-  color: #fff;
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 72.22% 50.59%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5% 64.9%;
+  --radius: 0.5rem;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 240 5% 64.9%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 50px;
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 10%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 85.7% 97.3%;
+  --border: 240 3.7% 30%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+  --sidebar-background: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 240 4.9% 83.9%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overscroll-behavior: none;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* [data-theme="dark"] {
+  --background-color: #000;
+  --text-color: #fff;
+  --border-color: #f2f2f2;
+  --pattern-fg: color-mix(in oklab, var(--color-white) 10%, transparent);
+} */
+
+/* .ql-toolbar.ql-snow,
+.ql-container.ql-snow {
+  border-color: hsl(var(--border) / 0.5) !important;
+} */
+
+/* .quill.editor {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-  margin-bottom: 20px;
+  flex: 1 1;
+} */
+
+.ql-snow .ql-stroke {
+  stroke: hsl(var(--foreground)) !important;
+}
+.ql-snow .ql-picker{
+  color: hsl(var(--foreground)) !important
+}
+.ql-editor{
+  min-height: 20rem;
+}
+.ql-editor.ql-blank::before {
+  color: rgb(167 167 167 / 60%) !important;
+  font-size: 1rem;
 }
 
-.editor-container {
-  /* width: 100%;
-  height: 100%; */
-  position: fixed;
-  inset: 0;
+
+.border-grid {
+  border-style: dashed;
+  border-color: hsl(var(--border) / 0.5);
 }
 
-/* Style for the Quill editor */
-.editor {
-  height: 100%;
+
+@media (min-width: 1400px) {
+  .container-wrapper {
+    border-left-width: 1px;
+    border-right-width: 1px;
+  }
+}
+.container-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 1400px;
+  border-style: dashed;
+  border-color: hsl(var(--border) / 0.7);
 }
 
-.App.night-mode .ql-editor {
-  /* Target the Quill editor's content area */
-  background-color: #444;
-  color: #eee;
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1536px;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
-.controls {
-  position: fixed;
-  right: 0;
-  top: 10;
+@media (min-width: 1280px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
-.controls button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 0 10px;
+.container {
+  width: 100%;
 }
 
-.App.night-mode .controls button {
-  background-color: #555;
-  color: #fff;
-  border: none;
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
 }
 
-.ql-toolbar{
-  border: 1px solid #e0e0e0;
-    box-sizing: border-box;
-    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-    padding: 8px;
-    border-radius: 1rem;
-    margin: 1rem;
-    background: #f2f2f2;
-    box-shadow: 0px 10px 5px #f2f2f2;
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
 }
