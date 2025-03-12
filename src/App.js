@@ -14,6 +14,7 @@ import { Input } from "./components/input";
 import Checkbox from "./components/checkbox";
 import { Switch } from "./components/switch";
 import { Moon, Sun } from "lucide-react";
+import CodeViewerGlobal from "./components/codeViewerGlobal";
 
 export const projects = [
   {
@@ -138,9 +139,9 @@ function createCard(metadata) {
   const html = `
     <div class="card">
       <a href="${metadata.url}" target="_blank" rel="noopener noreferrer">
-        ${metadata.image ? `<img src="${metadata.image}" alt="Preview">` : ""}
-        <h3>${metadata.title || "No Title"}</h3>
-        <p>${metadata.description || "No Description"}</p>
+        ${metadata.image ? `<img src="${metadata.image}" class="object-cover rounded mb-2 h-36 w-full " alt="Preview">` : ""}
+        <h3 class="text-sm capitalize mb-2 font-bold text-justify " >${metadata.title || "No Title"}</h3>
+        <p class="text-xs text-muted-foreground text-justify" >${metadata.description || "No Description"}</p>
       </a>
     </div>
   `;
@@ -244,6 +245,7 @@ function App() {
       onDragLeave={handleDragLeavePage} // optional
       onDrop={handleDropPage} // Handle the drop event
     >
+      {/* <CodeViewerGlobal change={cardData.length} /> */}
       <BgContainer />
       <div className="border-grid flex flex-1 flex-col">
         <header className="border-grid sticky top-0 z-50 w-full border-b ">

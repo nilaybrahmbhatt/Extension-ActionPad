@@ -56,8 +56,8 @@ export const HoverEffect = ({ items, className }) => {
                           __html: item.data,
                         }}
                       ></div>
-                      <div className="text-xs text-muted-foreground/50" >
-                        {new Date( item.date ).toLocaleString()}
+                      <div className="mt-3 text-xs text-right text-muted-foreground/50" >
+                        Added on {new Date( item.date ).toLocaleString()}
                       </div>
                     </div>
                   </div>
