@@ -20,6 +20,7 @@ export const HoverEffect = ({ items, className }) => {
         return (
           <div key={idx}>
             {itemArr.map((item, id) => {
+              console.log("🚀 ~ {itemArr.map ~ item:", item)
               return (
                 <div
                   key={id}
@@ -55,6 +56,9 @@ export const HoverEffect = ({ items, className }) => {
                           __html: item.data,
                         }}
                       ></div>
+                      <div className="text-xs text-muted-foreground/50" >
+                        {new Date( item.date ).toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 </div>

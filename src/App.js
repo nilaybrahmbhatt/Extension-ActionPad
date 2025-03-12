@@ -10,6 +10,10 @@ import { useTheme } from "./components/ThemeProvider";
 import AddNewCard from "./components/addNewCard";
 import axios from "axios";
 import { HoverEffect } from "./components/card-hover-effect";
+import { Input } from "./components/input";
+import Checkbox from "./components/checkbox";
+import { Switch } from "./components/switch";
+import { Moon, Sun } from "lucide-react";
 
 export const projects = [
   {
@@ -50,13 +54,46 @@ export const projects = [
   },
 ];
 
-// export function CardHoverEffectDemo() {
-//   return (
-//     <div className="max-w-5xl mx-auto px-8">
-//       <HoverEffect items={projects} />
-//     </div>
-//   );
-// }
+const BgContainer = () => {
+  return (
+    <div className="absolute inset-0  -z-10 ">
+      <svg class=" w-full h-full border-y border-dashed border-border stroke-border/70 ">
+        <defs>
+          <pattern
+            id="diagonal-footer-pattern"
+            patternUnits="userSpaceOnUse"
+            width="64"
+            height="64"
+          >
+            <path d="M-106 110L22 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-98 110L30 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-90 110L38 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-82 110L46 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-74 110L54 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-66 110L62 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-58 110L70 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-50 110L78 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-42 110L86 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-34 110L94 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-26 110L102 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-18 110L110 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-10 110L118 -18" stroke="" strokeWidth="1"></path>
+            <path d="M-2 110L126 -18" stroke="" strokeWidth="1"></path>
+            <path d="M6 110L134 -18" stroke="" strokeWidth="1"></path>
+            <path d="M14 110L142 -18" stroke="" strokeWidth="1"></path>
+            <path d="M22 110L150 -18" stroke="" strokeWidth="1"></path>
+          </pattern>
+        </defs>
+        <rect
+          stroke="none"
+          width="100%"
+          height="100%"
+          fill="url(#diagonal-footer-pattern)"
+        ></rect>
+      </svg>
+    </div>
+  );
+};
 
 async function getUrlMetadata(url) {
   try {
@@ -110,26 +147,18 @@ function createCard(metadata) {
   return html;
 }
 
+const filterButtons = ["All", "Images", "Links"];
 function App() {
-  const [text, setText] = useState();
-  const [nightMode, setNightMode] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const quillRef = useRef(null); // Ref to access Quill editor instance
+  // const [text, setText] = useState();
+  // const [nightMode, setNightMode] = useState(false);
+  // const [loading, setLoading] = useState(true);
+  // const quillRef = useRef(null); // Ref to access Quill editor instance
   const [editorMounted, setEditorMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [filter, setFilter] = useState("All");
 
   const [cardData, setCardData] = useState([]);
-  // const [value, setValue, isPersistent, error, isInitialStateResolved] =
-  //   useChromeStorageLocal("userNotes", "");
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   if (isInitialStateResolved) {
-  //     setEditorMounted(true);
-  //     setText(value);
-  //     setLoading(false);
-  //   }
-  // }, [isInitialStateResolved]);
+  const [allCardData, setAllCardData] = useState([]);
 
   const handleaddCard = async (content) => {
     let allContent = content;
@@ -138,17 +167,17 @@ function App() {
       const updatedContent = await Promise.all(
         links.map(async (link) => {
           const metadata = await getUrlMetadata(link);
-          console.log("🚀 ~ handleChange ~ metadata:", createCard(metadata));
           return { link, data: createCard(metadata) };
         })
       );
       updatedContent.map((item) => {
         allContent = allContent.replace(item.link, item.data);
       });
-      console.log(allContent);
       setCardData([...cardData, { date: new Date(), data: allContent }]);
+      setAllCardData([...cardData, { date: new Date(), data: allContent }]);
     } else {
       setCardData([...cardData, { date: new Date(), data: content }]);
+      setAllCardData([...cardData, { date: new Date(), data: content }]);
     }
   };
   function extractFullLinks(text) {
@@ -167,24 +196,58 @@ function App() {
     return links ? links : [];
   }
 
-  const handleNightModeToggle = () => {
-    setNightMode(!nightMode);
+  const onFilterButtonClick = (filter) => {
+    setFilter(filter);
+    if (filter === "All") {
+      setCardData(allCardData);
+    } else if (filter === "Images") {
+      const filteredData = allCardData.filter((item) => {
+        return item.data.includes("<img");
+      });
+      setCardData(filteredData);
+    } else if (filter === "Links") {
+      const filteredData = allCardData.filter((item) => {
+        return item.data.includes("<a");
+      });
+      setCardData(filteredData);
+    } else if (filter === "Tasks") {
+      const filteredData = allCardData.filter((item) => {
+        return item.data.includes("<input");
+      });
+      setCardData(filteredData);
+    } else {
+      const filteredData = allCardData.filter((item) => {
+        return item.data.includes(filter);
+      });
+      setCardData(filteredData);
+    }
   };
 
-  const handleExportPdf = async () => {
-    generatePdf(text);
+  const handleDragEnterPage = (e) => {
+    e.preventDefault();
+  };
+  const handleDragLeavePage = (e) => {
+    e.preventDefault();
   };
 
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-  console.log("card data >>>>>>>>>>>>>>>>>>>>> ", cardData);
+  const handleDropPage = (e) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+    console.log("🚀 ~ handleDropPage ~ data:", data)
+    
+  };
 
   return (
-    <div className={`relative flex min-h-svh flex-col`}>
+    <div
+      className={`relative flex min-h-svh flex-col`}
+      onDragEnter={handleDragEnterPage} // optional
+      onDragLeave={handleDragLeavePage} // optional
+      onDrop={handleDropPage} // Handle the drop event
+    >
+      <BgContainer />
       <div className="border-grid flex flex-1 flex-col">
-        <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container-wrapper">
+        <header className="border-grid sticky top-0 z-50 w-full border-b ">
+          <div className="container-wrapper bg-background ">
             <div className="container flex h-14 items-center gap-2 md:gap-4">
               <div className="mr-4 hidden md:flex">
                 <h5 className="font-bold  uppercase text-blue-500 ">
@@ -194,182 +257,76 @@ function App() {
               <div className="ml-auto flex items-center gap-2 md:flex-1 md:justify-end">
                 <div className="">
                   <div className="flex items-center">
-                    <a
-                      className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                      data-active="true"
-                      href="/"
-                    >
-                      All
-                    </a>
-                    <a
-                      className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                      data-active="false"
-                      href="/examples/mail"
-                    >
-                      Images
-                    </a>
-                    <a
-                      className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                      data-active="false"
-                      href="/examples/mail"
-                    >
-                      Links
-                    </a>
-                    <a
-                      className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                      data-active="false"
-                      href="/examples/mail"
-                    >
-                      Tasks
-                    </a>
+                    <Input
+                      placeholder="Type to search all your saved actions"
+                      type="search"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const filteredData = allCardData.filter((item) => {
+                          return item.data.includes(value);
+                        });
+                        setCardData(filteredData);
+                      }}
+                    />
+
+                    {filterButtons.map((button, index) => {
+                      return (
+                        <button
+                          key={index}
+                          className={`flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary ${
+                            filter === button ? "bg-muted text-primary" : ""
+                          }`}
+                          data-active={filter === button ? "true" : "false"}
+                          onClick={() => onFilterButtonClick(button)}
+                        >
+                          {button}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                {/* <nav className="flex items-center gap-0.5">
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 w-8 px-0"
-                    href="https://github.com/shadcn-ui/ui"
+                <div>
+                  <button
+                    onClick={toggleTheme}
+                    className="hover:bg-slate-700/50 p-3 rounded "
                   >
-                    <span className="sr-only">GitHub</span>
-                  </a>
-                </nav> */}
+                    {theme === "dark" ? (
+                      <Sun size={16} strokeWidth={1.5} color="#fff" />
+                    ) : (
+                      <Moon size={16} strokeWidth={1.5} color="#000" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </header>
-        <main className="flex flex-1 flex-col">
-          <section className="border-grid border-b">
-            <div className="container-wrapper">
-              <div className="grid grid-cols-4 gap-5 p-5 ">
-                <div>
+        <main className="flex flex-1 flex-col h-full">
+          <section className="border-grid flex-1 flex border-b">
+            <div className="container-wrapper bg-background ">
+              <div className="grid grid-cols-4 h-full gap-5  ">
+                <div className="border-border/70 border-r border-dashed bg-card ">
                   <AddNewCard handleaddCard={handleaddCard} />
                 </div>
                 <div className=" col-span-3">
-                  {
-                    cardData && cardData.length > 0 && (
-                      <HoverEffect items={cardData} />
-                    )
-                  }
-                  {/* {cardData &&
-                    cardData.map((card, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className=" border-border border rounded-xl p-5 mb-5 "
-                        >
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: card.data,
-                            }}
-                          ></div>
-                        </div>
-                      );
-                    })} */}
+                  {cardData && cardData.length > 0 && (
+                    <HoverEffect items={cardData} />
+                  )}
                 </div>
               </div>
-
-              {/* <div className=" flex flex-row   ">
-                <div className="flex-1">
-                  <div className="border-r border-border/70 border-dashed ">
-                    
-                  </div>
-                </div>
-                <div className="flex-1">card 2</div>
-                <div className="flex-1">card 3</div>
-              </div> */}
             </div>
           </section>
-          {/* <div className="border-grid border-b">
-            <div className="container-wrapper">
-              <div className="container py-4">
-                <div className="relative">
-                  <div
-                    dir="ltr"
-                    className="relative overflow-hidden max-w-[600px] lg:max-w-none"
-                  >
-                    <div
-                      data-radix-scroll-area-viewport=""
-                      className="h-full w-full rounded-[inherit]"
-                    >
-                      <div>
-                        <div className="flex items-center [&amp;>a:first-child]:text-primary">
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="true"
-                            href="/"
-                          >
-                            Examples
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/mail"
-                          >
-                            Mail
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/dashboard"
-                          >
-                            Dashboard
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/tasks"
-                          >
-                            Tasks
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/playground"
-                          >
-                            Playground
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/forms"
-                          >
-                            Forms
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/music"
-                          >
-                            Music
-                          </a>
-                          <a
-                            className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[active=true]:bg-muted data-[active=true]:text-primary"
-                            data-active="false"
-                            href="/examples/authentication"
-                          >
-                            Authentication
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </main>
-
-        <footer class="border-grid border-t py-6 md:py-0">
-          <div class="container-wrapper">
-            <div class="container py-4">
-              <div class="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+        <footer className="border-grid border-t py-6 md:py-0">
+          <div className="container-wrapper bg-background ">
+            <div className="container py-4">
+              <div className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
                 Built b{" "}
                 <a
                   href="https://twitter.com/shadcn"
                   target="_blank"
                   rel="noreferrer"
-                  class="font-medium underline underline-offset-4"
+                  className="font-medium underline underline-offset-4"
                 >
                   shadcn
                 </a>
@@ -378,7 +335,7 @@ function App() {
                   href="https://github.com/shadcn-ui/ui"
                   target="_blank"
                   rel="noreferrer"
-                  class="font-medium underline underline-offset-4"
+                  className="font-medium underline underline-offset-4"
                 >
                   GitHub
                 </a>
