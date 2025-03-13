@@ -126,9 +126,9 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-body * {
-  @apply transition-colors duration-200;
-}
+/* body * {
+  @apply transition-colors duration-500;
+} */
 
 /* [data-theme="dark"] {
   --background-color: #000;

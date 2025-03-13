@@ -400,3 +400,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 build
+build/index.html
+build/asset-manifest.json
