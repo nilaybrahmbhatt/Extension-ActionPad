@@ -1,26 +1,37 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { cn } from "../utils/utills";
+import { DeleteIcon, Trash } from "lucide-react";
 
 function distributeArray(arr) {
-    const columns = [[], [], []];
+  const columns = [[], [], []];
+  let columnHeights = [0, 0, 0];
 
-    arr.forEach((item, index) => {
-        columns[index % 3].push(item);
+  arr.forEach((item, index) => {
+    const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights));
+    const itemSize = item.data.length; // Calculate size based on item.data length
+    columns[minHeightIndex].push({
+      ...item,
+      mainIndex: index,
     });
+    columnHeights[minHeightIndex] += itemSize;
+  });
 
-    return columns;
+  return columns;
 }
 
-export const HoverEffect = ({ items, className }) => {
+export const HoverEffect = ({ items, className, onDeleteCard }) => {
   let [hoveredIndex, setHoveredIndex] = useState(null);
+  const deleteItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    onDeleteCard(newItems);
+  };
   return (
     <div className={cn("grid grid-cols-3", className)}>
       {distributeArray(items).map((itemArr, idx) => {
         return (
           <div key={idx}>
             {itemArr.map((item, id) => {
-              console.log("🚀 ~ {itemArr.map ~ item:", item)
               return (
                 <div
                   key={id}
@@ -47,7 +58,7 @@ export const HoverEffect = ({ items, className }) => {
                   </AnimatePresence>
                   <div
                     className={cn(
-                      "rounded p-4 overflow-hidden bg-black border border-border/50 relative z-20"
+                      "rounded p-4 overflow-hidden bg-background border border-border/50 relative z-20"
                     )}
                   >
                     <div className="relative z-50">
@@ -56,8 +67,21 @@ export const HoverEffect = ({ items, className }) => {
                           __html: item.data,
                         }}
                       ></div>
-                      <div className="mt-3 text-xs text-right text-muted-foreground/50" >
-                        Added on {new Date( item.date ).toLocaleString()}
+                      <div className="flex mt-3 flex-row gap-2 items-center ">
+                        <button
+                          onClick={() => deleteItem(item.mainIndex)}
+                          className={
+                            "hover:bg-red-600/50 p-2 rounded " +
+                            (hoveredIndex === id + "-" + idx
+                              ? "opacity-100"
+                              : "opacity-0")
+                          }
+                        >
+                          <Trash size={16} strokeWidth={1.5} />
+                        </button>
+                        <div className="flex-1 text-xs text-right text-muted-foreground/50">
+                          Added on {new Date(item.date).toLocaleString()}
+                        </div>
                       </div>
                     </div>
                   </div>

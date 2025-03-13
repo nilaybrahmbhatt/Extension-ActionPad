@@ -7,7 +7,7 @@ import "react-quill-new/dist/quill.snow.css";
 import { Switch } from "./switch";
 
 export default function AddNewCard(props) {
-  const { handleaddCard, setInputText } = props;
+  const { handleaddCard } = props;
   const quillRef = useRef();
   const [text, setText] = useState();
   const [isTask, setIsTask] = useState(false);
@@ -15,21 +15,67 @@ export default function AddNewCard(props) {
   const handleChange = (content, delta, source, editor) => {
     setText(content);
   };
+  const handleDragEnterPage = (e) => {
+    e.preventDefault();
+  };
+  const handleDragLeavePage = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDropPage = (e) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+    const files = e.dataTransfer.files;
+
+    if (files.length > 0) {
+      const file = files[0];
+      // if (file.type.startsWith("image/")) {
+      //   const reader = new FileReader();
+      //   reader.onload = (event) => {
+      //     const imgTag = `<img src="${event.target.result}" alt="Dropped Image" />`;
+      //     setText(text + "<br />" + imgTag);
+      //   };
+      //   reader.readAsDataURL(file);
+      // } else {
+      //   console.log("Dropped file is not an image.");
+      // }
+    } else {
+      setText(text + data);
+    }
+  };
 
   return (
-    <div className="rounded-xl p-0 flex flex-col h-full">
-      <div className="flex-1 border-border/70 border-b border-dashed">
+    <div
+      className="rounded-xl p-0 flex flex-col h-full "
+      onDragEnter={handleDragEnterPage} // optional
+      onDragLeave={handleDragLeavePage} // optional
+      onDrop={handleDropPage} // Handle the drop event
+    >
+      <div className="flex-1 overflow-auto max-h-[69svh] border-border/70 border-b border-dashed  ">
         <ReactQuill
           ref={quillRef}
           modules={{
             toolbar: [
-              [{ header: "1" }, { header: "2" }],[
+              [{ header: "1" }, { header: "2" }],
+              [
                 ("bold",
                 "italic",
                 "underline",
                 "strike",
                 "blockquote",
-                "code-block")
+                "code-block"),
+              ],
+              [
+                {
+                  color: [
+                    "#F00",
+                    "#0F0",
+                    "#00F",
+                    "#000",
+                    "#FFF",
+                    "color-picker",
+                  ],
+                },
               ],
               [
                 { list: "ordered" },
@@ -45,6 +91,7 @@ export default function AddNewCard(props) {
               matchVisual: true,
             },
           }}
+          value={text}
           placeholder="Start writing your notes here..."
           theme="snow"
           onChange={handleChange}
@@ -52,7 +99,7 @@ export default function AddNewCard(props) {
       </div>
       <div className="p-5">
         <div>
-          <div className="flex gap-5">
+          {/* <div className="flex gap-5">
             <Switch label="is task?" checked={isTask} setChecked={setIsTask} />
             {isTask && (
               <input
@@ -61,7 +108,7 @@ export default function AddNewCard(props) {
                 className="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
               ></input>
             )}
-          </div>
+          </div> */}
           <button
             onClick={() => {
               handleaddCard(text);

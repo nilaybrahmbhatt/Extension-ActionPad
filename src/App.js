@@ -15,6 +15,7 @@ import Checkbox from "./components/checkbox";
 import { Switch } from "./components/switch";
 import { Moon, Sun } from "lucide-react";
 import CodeViewerGlobal from "./components/codeViewerGlobal";
+import BubbleCursor from "./components/moving-border";
 
 export const projects = [
   {
@@ -139,9 +140,17 @@ function createCard(metadata) {
   const html = `
     <div class="card">
       <a href="${metadata.url}" target="_blank" rel="noopener noreferrer">
-        ${metadata.image ? `<img src="${metadata.image}" class="object-cover rounded mb-2 h-36 w-full " alt="Preview">` : ""}
-        <h3 class="text-sm capitalize mb-2 font-bold text-justify " >${metadata.title || "No Title"}</h3>
-        <p class="text-xs text-muted-foreground text-justify" >${metadata.description || "No Description"}</p>
+        ${
+          metadata.image
+            ? `<img src="${metadata.image}" class="object-cover rounded mb-2 h-36 w-full " alt="Preview">`
+            : ""
+        }
+        <h3 class="text-sm capitalize mb-2 font-bold text-justify " >${
+          metadata.title || "No Title"
+        }</h3>
+        <p class="text-xs text-muted-foreground text-justify" >${
+          metadata.description || "No Description"
+        }</p>
       </a>
     </div>
   `;
@@ -154,7 +163,7 @@ function App() {
   // const [nightMode, setNightMode] = useState(false);
   // const [loading, setLoading] = useState(true);
   // const quillRef = useRef(null); // Ref to access Quill editor instance
-  const [editorMounted, setEditorMounted] = useState(false);
+  // const [editorMounted, setEditorMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("All");
 
@@ -224,28 +233,11 @@ function App() {
     }
   };
 
-  const handleDragEnterPage = (e) => {
-    e.preventDefault();
-  };
-  const handleDragLeavePage = (e) => {
-    e.preventDefault();
-  };
-
-  const handleDropPage = (e) => {
-    e.preventDefault();
-    const data = e.dataTransfer.getData("text/plain");
-    console.log("🚀 ~ handleDropPage ~ data:", data)
-    
-  };
-
+  
   return (
     <div
       className={`relative flex min-h-svh flex-col`}
-      onDragEnter={handleDragEnterPage} // optional
-      onDragLeave={handleDragLeavePage} // optional
-      onDrop={handleDropPage} // Handle the drop event
     >
-      {/* <CodeViewerGlobal change={cardData.length} /> */}
       <BgContainer />
       <div className="border-grid flex flex-1 flex-col">
         <header className="border-grid sticky top-0 z-50 w-full border-b ">
@@ -306,13 +298,17 @@ function App() {
         <main className="flex flex-1 flex-col h-full">
           <section className="border-grid flex-1 flex border-b">
             <div className="container-wrapper bg-background ">
-              <div className="grid grid-cols-4 h-full gap-5  ">
-                <div className="border-border/70 border-r border-dashed bg-card ">
+              <div className="grid grid-cols-4 h-full ">
+                <div className="border-border/70  border-dashed bg-card border ">
                   <AddNewCard handleaddCard={handleaddCard} />
                 </div>
-                <div className=" col-span-3">
+                <div className=" col-span-3 overflow-auto max-h-[83svh]  ">
+                  
                   {cardData && cardData.length > 0 && (
-                    <HoverEffect items={cardData} />
+                    <HoverEffect items={cardData} onDeleteCard={(newItems)=>{
+                      setCardData(newItems)
+                      setAllCardData(newItems)
+                    }} />
                   )}
                 </div>
               </div>
@@ -347,68 +343,69 @@ function App() {
           </div>
         </footer>
       </div>
+      <BubbleCursor></BubbleCursor>
     </div>
   );
 
-  return (
-    <div
-      className={`dark:bg-black min-h-screen  ${
-        theme === "dark" ? "dark-mode" : ""
-      }`}
-    >
-      <div className="w-full border-b border-[#27272a] border-dashed px-5 py-2 ">
-        <h5 className="text-lg dark:text-white font-extrabold font-roboto">
-          ActionPad
-        </h5>
-      </div>
-      <div className="border-x border-x-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 max-lg:hidden dark:[--pattern-fg:var(--color-white)]/10">
-        sdsd
-      </div>
-      {/* <div className="card-container">
-        <div className="card p-0">
-          <h5>Your Notes</h5>
-          <ReactQuill
-            ref={quillRef}
-            modules={{
-              toolbar: [
-                [{ header: [1, 2, false] }],
-                ["bold", "italic", "underline", "strike", "blockquote"],
-                [
-                  { list: "ordered" },
-                  { list: "bullet" },
-                  { indent: "-1" },
-                  { indent: "+1" },
-                ],
-                ["link", "image"],
-              ],
-              syntax: false,
-              clipboard: {
-                matchVisual: true,
-              },
-            }}
-            className="editor"
-            theme="snow"
-            defaultValue={text}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="card">
-          <h2>Card 2</h2>
-          <p>
-            This is the content of card 2. It fills the entire height of the
-            card. You can put more content here.
-          </p>
-        </div>
-        <div className="card">
-          <h2>Card 3</h2>
-          <p>
-            This is the content of card 3. It fills the entire height of the
-            card.
-          </p>
-        </div>
-      </div> */}
-    </div>
-  );
+  // return (
+  //   <div
+  //     className={`dark:bg-black min-h-screen  ${
+  //       theme === "dark" ? "dark-mode" : ""
+  //     }`}
+  //   >
+  //     <div className="w-full border-b border-[#27272a] border-dashed px-5 py-2 ">
+  //       <h5 className="text-lg dark:text-white font-extrabold font-roboto">
+  //         ActionPad
+  //       </h5>
+  //     </div>
+  //     <div className="border-x border-x-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 max-lg:hidden dark:[--pattern-fg:var(--color-white)]/10">
+  //       sdsd
+  //     </div>
+  //     {/* <div className="card-container">
+  //       <div className="card p-0">
+  //         <h5>Your Notes</h5>
+  //         <ReactQuill
+  //           ref={quillRef}
+  //           modules={{
+  //             toolbar: [
+  //               [{ header: [1, 2, false] }],
+  //               ["bold", "italic", "underline", "strike", "blockquote"],
+  //               [
+  //                 { list: "ordered" },
+  //                 { list: "bullet" },
+  //                 { indent: "-1" },
+  //                 { indent: "+1" },
+  //               ],
+  //               ["link", "image"],
+  //             ],
+  //             syntax: false,
+  //             clipboard: {
+  //               matchVisual: true,
+  //             },
+  //           }}
+  //           className="editor"
+  //           theme="snow"
+  //           defaultValue={text}
+  //           onChange={handleChange}
+  //         />
+  //       </div>
+  //       <div className="card">
+  //         <h2>Card 2</h2>
+  //         <p>
+  //           This is the content of card 2. It fills the entire height of the
+  //           card. You can put more content here.
+  //         </p>
+  //       </div>
+  //       <div className="card">
+  //         <h2>Card 3</h2>
+  //         <p>
+  //           This is the content of card 3. It fills the entire height of the
+  //           card.
+  //         </p>
+  //       </div>
+  //     </div> */}
+  //   </div>
+  // );
 }
 
 export default App;

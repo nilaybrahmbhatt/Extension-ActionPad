@@ -44,6 +44,8 @@
   --sidebar-accent-foreground: 240 5.9% 10%;
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 240 5% 64.9%;
+  --scrollbar-thumb: theme('colors.gray.500');
+  --scrollbar-track: theme('colors.gray.200');
 }
 
 .dark {
@@ -79,7 +81,38 @@
   --sidebar-accent-foreground: 240 4.8% 95.9%;
   --sidebar-border: 240 3.7% 15.9%;
   --sidebar-ring: 240 4.9% 83.9%;
+  --scrollbar-thumb: theme('colors.gray.700');
+  --scrollbar-track: theme('colors.gray.900');
 }
+
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+ *::-webkit-scrollbar-track {
+  @apply bg-gray-200 dark:bg-gray-900 rounded-full;
+}
+
+*::-webkit-scrollbar-thumb {
+  @apply bg-gray-500 dark:bg-gray-700 rounded-full;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-600 dark:bg-gray-800;
+}
+
+.global-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.gray.500') theme('colors.gray.200'); /* thumb, track */
+}
+
+.dark .global-scrollbar{
+    scrollbar-color: theme('colors.gray.700') theme('colors.gray.900');
+}
+
+
 
 html {
   scroll-behavior: smooth;
@@ -107,7 +140,7 @@ body * {
 .ql-container.ql-snow {
   border: 0px !important;
 }
-.ql-code-block-container{
+.ql-code-block-container {
   background: hsl(var(--muted));
   /* background: rgb(30 41 59 / 57%); */
   padding: 10px;
@@ -115,12 +148,16 @@ body * {
   border-radius: 6px;
   color: hsl(var(--foreground));
 }
+.ql-snow .ql-fill,
+.ql-snow .ql-stroke.ql-fill {
+  fill:  hsl(var(--foreground)) !important;
+}
 /* .quill.editor {
   display: flex;
   flex-direction: column;
   flex: 1 1;
 } */
-.ql-toolbar.ql-snow{
+.ql-toolbar.ql-snow {
   border: 0px !important;
   border-bottom: 1px solid hsl(var(--border)) !important;
 }
@@ -128,10 +165,10 @@ body * {
 .ql-snow .ql-stroke {
   stroke: hsl(var(--foreground)) !important;
 }
-.ql-snow .ql-picker{
-  color: hsl(var(--foreground)) !important
+.ql-snow .ql-picker {
+  color: hsl(var(--foreground)) !important;
 }
-.ql-editor{
+.ql-editor {
   min-height: 20rem;
 }
 .ql-editor.ql-blank::before {
@@ -139,12 +176,10 @@ body * {
   font-size: 1rem;
 }
 
-
 .border-grid {
   border-style: dashed;
   border-color: hsl(var(--border) / 0.5);
 }
-
 
 @media (min-width: 1400px) {
   .container-wrapper {
