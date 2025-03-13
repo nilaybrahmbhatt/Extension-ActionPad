@@ -5,6 +5,8 @@ import { useRef, useState } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { Switch } from "./switch";
+import { Button } from "./moving-border";
+import { HoverBorderGradient } from "./hover-border-gradient";
 
 export default function AddNewCard(props) {
   const { handleaddCard } = props;
@@ -51,7 +53,7 @@ export default function AddNewCard(props) {
       onDragLeave={handleDragLeavePage} // optional
       onDrop={handleDropPage} // Handle the drop event
     >
-      <div className="flex-1 overflow-auto max-h-[69svh] border-border/70 border-b border-dashed  ">
+      <div className="flex-1 overflow-auto max-h-[73svh] border-border/70 border-b border-dashed  ">
         <ReactQuill
           ref={quillRef}
           modules={{
@@ -77,14 +79,9 @@ export default function AddNewCard(props) {
                   ],
                 },
               ],
-              [
-                { list: "ordered" },
-                { list: "bullet" },
-                // { indent: "-1" },
-                // { indent: "+1" },
-              ],
-              ["clean"],
-              ["link", "image"],
+              [{ list: "ordered" }, { list: "bullet" }],
+              ["image", "clean"],
+              [],
             ],
             syntax: false,
             clipboard: {
@@ -109,7 +106,25 @@ export default function AddNewCard(props) {
               ></input>
             )}
           </div> */}
-          <button
+          <Button onClick={() => {
+              handleaddCard(text);
+              setText("");
+            }}
+            containerClassName="h-10 w-full"
+            className="transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none w-full"
+            >
+            Add Note
+          </Button>
+          
+          {/* <HoverBorderGradient
+            containerClassName="rounded-full w-full"
+            as="button"
+            className="w-full"
+          >
+            Add New Action
+          </HoverBorderGradient> */}
+
+          {/* <button
             onClick={() => {
               handleaddCard(text);
               setText("");
@@ -117,7 +132,7 @@ export default function AddNewCard(props) {
             className=" mt-5 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"
           >
             Add Note
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

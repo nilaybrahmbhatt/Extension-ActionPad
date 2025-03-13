@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { cn } from "../utils/utills";
-import { DeleteIcon, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 
 function distributeArray(arr) {
   const columns = [[], [], []];

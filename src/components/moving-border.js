@@ -1,162 +1,102 @@
-'use client';
-import React, { useEffect, useRef } from 'react';
-class Particle {
-  lifeSpan;
-  initialLifeSpan;
-  velocity;
-  position;
-  baseDimension;
-  constructor(x, y) {
-    this.initialLifeSpan = Math.floor(Math.random() * 60 + 60);
-    this.lifeSpan = this.initialLifeSpan;
-    this.velocity = {
-      x: (Math.random() < 0.5 ? -1 : 1) * (Math.random() / 10),
-      y: -0.4 + Math.random() * -1,
-    };
-    this.position = { x, y };
-    this.baseDimension = 4;
-  }
-  update(context) {
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
-    this.velocity.x += ((Math.random() < 0.5 ? -1 : 1) * 2) / 75;
-    this.velocity.y -= Math.random() / 600;
-    this.lifeSpan--;
-    const scale =
-      0.2 + (this.initialLifeSpan - this.lifeSpan) / this.initialLifeSpan;
-    context.fillStyle = '#e6f1f7';
-    context.strokeStyle = '#3a92c5';
-    context.beginPath();
-    context.arc(
-      this.position.x - (this.baseDimension / 2) * scale,
-      this.position.y - this.baseDimension / 2,
-      this.baseDimension * scale,
-      0,
-      2 * Math.PI
-    );
-    context.stroke();
-    context.fill();
-    context.closePath();
-  }
+import React from "react";
+import {
+  motion,
+  useAnimationFrame,
+  useMotionTemplate,
+  useMotionValue,
+  useTransform,
+} from "motion/react";
+import { useRef } from "react";
+import { cn } from "../utils/utills";
+// import { cn } from "@/lib/utils";
+
+export function Button({
+  borderRadius = "1.75rem",
+  children,
+  as: Component = "button",
+  containerClassName,
+  borderClassName,
+  duration,
+  className,
+  ...otherProps
+}) {
+  return (
+    (<Component
+      className={cn(
+        "bg-transparent relative p-[1px] overflow-hidden ",
+        containerClassName
+      )}
+      style={{
+        borderRadius: borderRadius,
+      }}
+      {...otherProps}>
+      <div
+        className="absolute inset-0"
+        style={{ borderRadius: `calc(${borderRadius} * 0.96)` }}>
+        <MovingBorder duration={duration} rx="30%" ry="30%">
+          <div
+            className={cn(
+              "h-20 w-20 opacity-[0.8] bg-[radial-gradient(var(--sky-500)_40%,transparent_60%)]",
+              borderClassName
+            )} />
+        </MovingBorder>
+      </div>
+      <div
+        className={cn(
+          "relative bg-chart-1/[0.7] hover:bg-chart-1 border border-slate-800 backdrop-blur-xl text-white flex items-center justify-center w-full h-full text-sm antialiased",
+          className
+        )}
+        style={{
+          borderRadius: `calc(${borderRadius} * 0.96)`,
+        }}>
+        {children}
+      </div>
+    </Component>)
+  );
 }
-const BubbleCursor = ({ wrapperElement }) => {
-  const canvasRef = useRef(null);
-  const particlesRef = useRef([]);
-  const cursorRef = useRef({ x: 0, y: 0 });
-  const animationFrameRef = useRef(null);
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    );
-    let canvas = null;
-    let context = null;
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    const init = () => {
-      if (prefersReducedMotion.matches) {
-        console.log(
-          'This browser has prefers reduced motion turned on, so the cursor did not init'
-        );
-        return false;
-      }
-      canvas = canvasRef.current;
-      if (!canvas) return;
-      context = canvas.getContext('2d');
-      if (!context) return;
-      canvas.style.top = '0px';
-      canvas.style.left = '0px';
-      canvas.style.pointerEvents = 'none';
-      if (wrapperElement) {
-        canvas.style.position = 'absolute';
-        wrapperElement.appendChild(canvas);
-        canvas.width = wrapperElement.clientWidth;
-        canvas.height = wrapperElement.clientHeight;
-      } else {
-        canvas.style.position = 'fixed';
-        document.body.appendChild(canvas);
-        canvas.width = width;
-        canvas.height = height;
-      }
-      bindEvents();
-      loop();
-    };
-    const bindEvents = () => {
-      const element = wrapperElement || document.body;
-      element.addEventListener('mousemove', onMouseMove);
-      element.addEventListener('touchmove', onTouchMove, { passive: true });
-      element.addEventListener('touchstart', onTouchMove, { passive: true });
-      window.addEventListener('resize', onWindowResize);
-    };
-    const onWindowResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      if (!canvasRef.current) return;
-      if (wrapperElement) {
-        canvasRef.current.width = wrapperElement.clientWidth;
-        canvasRef.current.height = wrapperElement.clientHeight;
-      } else {
-        canvasRef.current.width = width;
-        canvasRef.current.height = height;
-      }
-    };
-    const onTouchMove = (e) => {
-      if (e.touches.length > 0) {
-        for (let i = 0; i < e.touches.length; i++) {
-          addParticle(e.touches[i].clientX, e.touches[i].clientY);
-        }
-      }
-    };
-    const onMouseMove = (e) => {
-      if (wrapperElement) {
-        const boundingRect = wrapperElement.getBoundingClientRect();
-        cursorRef.current.x = e.clientX - boundingRect.left;
-        cursorRef.current.y = e.clientY - boundingRect.top;
-      } else {
-        cursorRef.current.x = e.clientX;
-        cursorRef.current.y = e.clientY;
-      }
-      addParticle(cursorRef.current.x, cursorRef.current.y);
-    };
-    const addParticle = (x, y) => {
-      particlesRef.current.push(new Particle(x, y));
-    };
-    const updateParticles = () => {
-      if (!canvas || !context) return;
-      if (particlesRef.current.length === 0) {
-        return;
-      }
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < particlesRef.current.length; i++) {
-        particlesRef.current[i].update(context);
-      }
-      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
-        if (particlesRef.current[i].lifeSpan < 0) {
-          particlesRef.current.splice(i, 1);
-        }
-      }
-      if (particlesRef.current.length === 0) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    };
-    const loop = () => {
-      updateParticles();
-      animationFrameRef.current = requestAnimationFrame(loop);
-    };
-    init();
-    return () => {
-      if (canvas) {
-        canvas.remove();
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      const element = wrapperElement || document.body;
-      element.removeEventListener('mousemove', onMouseMove);
-      element.removeEventListener('touchmove', onTouchMove);
-      element.removeEventListener('touchstart', onTouchMove);
-      window.removeEventListener('resize', onWindowResize);
-    };
-  }, [wrapperElement]);
-  return <canvas ref={canvasRef} />;
+
+export const MovingBorder = ({
+  children,
+  duration = 2000,
+  rx,
+  ry,
+  ...otherProps
+}) => {
+  const pathRef = useRef();
+  const progress = useMotionValue(0);
+
+  useAnimationFrame((time) => {
+    const length = pathRef.current?.getTotalLength();
+    if (length) {
+      const pxPerMillisecond = length / duration;
+      progress.set((time * pxPerMillisecond) % length);
+    }
+  });
+
+  const x = useTransform(progress, (val) => pathRef.current?.getPointAtLength(val).x);
+  const y = useTransform(progress, (val) => pathRef.current?.getPointAtLength(val).y);
+
+  const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
+
+  return (<>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+      className="absolute h-full w-full"
+      width="100%"
+      height="100%"
+      {...otherProps}>
+      <rect fill="none" width="100%" height="100%" rx={rx} ry={ry} ref={pathRef} />
+    </svg>
+    <motion.div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        display: "inline-block",
+        transform,
+      }}>
+      {children}
+    </motion.div>
+  </>);
 };
-export default BubbleCursor;

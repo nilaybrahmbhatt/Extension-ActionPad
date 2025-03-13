@@ -1,21 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import * as Cheerio from "cheerio";
-
-import { generatePdf } from "./utils/pdfGenerator";
+// import { generatePdf } from "./utils/pdfGenerator";
 import { useChromeStorageLocal } from "use-chrome-storage";
-import ReactQuill from "react-quill-new";
+// import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.bubble.css";
 import { useTheme } from "./components/ThemeProvider";
 import AddNewCard from "./components/addNewCard";
 import axios from "axios";
 import { HoverEffect } from "./components/card-hover-effect";
 import { Input } from "./components/input";
-import Checkbox from "./components/checkbox";
-import { Switch } from "./components/switch";
+// import Checkbox from "./components/checkbox";
+// import { Switch } from "./components/switch";
 import { Moon, Sun } from "lucide-react";
-import CodeViewerGlobal from "./components/codeViewerGlobal";
-import BubbleCursor from "./components/moving-border";
+// import CodeViewerGlobal from "./components/codeViewerGlobal";
+import BubbleCursor from "./components/bubble-cursor";
 
 export const projects = [
   {
@@ -163,12 +162,36 @@ function App() {
   // const [nightMode, setNightMode] = useState(false);
   // const [loading, setLoading] = useState(true);
   // const quillRef = useRef(null); // Ref to access Quill editor instance
-  // const [editorMounted, setEditorMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("All");
 
   const [cardData, setCardData] = useState([]);
   const [allCardData, setAllCardData] = useState([]);
+
+  const [editorMounted, setEditorMounted] = useState(false);
+  const [value, setValue, isPersistent, error, isInitialStateResolved] =
+    useChromeStorageLocal("userNotes", "");
+
+  useEffect(() => {
+    if (isInitialStateResolved) {
+      setEditorMounted(true);
+      if (typeof value == "string") {
+        setAllCardData(JSON.parse(value));
+        setCardData(JSON.parse(value));
+      } else {
+        setAllCardData(value);
+        setCardData(value);
+      }
+    }
+  }, [isInitialStateResolved]);
+
+  useEffect(() => {
+    if (allCardData.length > 0) {
+      try {
+        setValue(JSON.stringify(allCardData));
+      } catch (e) {}
+    }
+  }, [allCardData.length]);
 
   const handleaddCard = async (content) => {
     let allContent = content;
@@ -233,11 +256,8 @@ function App() {
     }
   };
 
-  
   return (
-    <div
-      className={`relative flex min-h-svh flex-col`}
-    >
+    <div className={`relative flex min-h-svh flex-col`}>
       <BgContainer />
       <div className="border-grid flex flex-1 flex-col">
         <header className="border-grid sticky top-0 z-50 w-full border-b ">
@@ -303,12 +323,14 @@ function App() {
                   <AddNewCard handleaddCard={handleaddCard} />
                 </div>
                 <div className=" col-span-3 overflow-auto max-h-[83svh]  ">
-                  
                   {cardData && cardData.length > 0 && (
-                    <HoverEffect items={cardData} onDeleteCard={(newItems)=>{
-                      setCardData(newItems)
-                      setAllCardData(newItems)
-                    }} />
+                    <HoverEffect
+                      items={cardData}
+                      onDeleteCard={(newItems) => {
+                        setCardData(newItems);
+                        setAllCardData(newItems);
+                      }}
+                    />
                   )}
                 </div>
               </div>
