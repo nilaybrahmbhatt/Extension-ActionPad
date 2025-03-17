@@ -402,3 +402,4 @@ FodyWeavers.xsd
 build
 build/index.html
 build/asset-manifest.json
+build/*

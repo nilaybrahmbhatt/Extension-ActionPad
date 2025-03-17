@@ -42,7 +42,7 @@ export const HoverEffect = ({ items, className, onDeleteCard }) => {
                   <AnimatePresence>
                     {hoveredIndex === id + "-" + idx && (
                       <motion.span
-                        className="absolute inset-0  bg-slate-800 block rounded"
+                        className="absolute inset-0  bg-sidebar-ring/50 block rounded"
                         layoutId="hoverBackground"
                         initial={{ opacity: 0 }}
                         animate={{

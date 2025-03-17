@@ -3,7 +3,7 @@
   "name": "My New Tab Editor",
   "version": "1.0",
   "description": "A simple text editor that replaces the new tab page.",
-  "permissions": ["storage"],
+  "permissions": ["storage","bookmarks"],
   "chrome_url_overrides": {
     "newtab": "index.html"
   }

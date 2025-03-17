@@ -15,6 +15,7 @@ import { Input } from "./components/input";
 import { Moon, Sun } from "lucide-react";
 // import CodeViewerGlobal from "./components/codeViewerGlobal";
 import BubbleCursor from "./components/bubble-cursor";
+import { extractBookmarks } from "./utils/utills";
 
 export const projects = [
   {
@@ -98,36 +99,29 @@ const BgContainer = () => {
 
 async function getUrlMetadata(url) {
   try {
-    const response = await axios.get(url, { timeout: 5000 }); // Adjust timeout as needed
+    const response = await axios.get(url); // Adjust timeout as needed
 
     if (response.status >= 400) {
-      throw new Error(`HTTP error! status: ${response.status}`); // Throw error for bad responses
+    } else {
+      const $ = Cheerio.load(response.data); // Load the HTML into cheerio
+      const title = $("title").text() || null;
+      let description = $('meta[name="description"]').attr("content");
+      description =
+        description || $('meta[property="og:description"]').attr("content");
+      description = description || null;
+
+      let image = $('meta[property="og:image"]').attr("content");
+      image = image || null;
+
+      return {
+        url: url,
+        title: title,
+        description: description,
+        image: image,
+      };
     }
-
-    const $ = Cheerio.load(response.data); // Load the HTML into cheerio
-    const title = $("title").text() || null;
-    let description = $('meta[name="description"]').attr("content");
-    description =
-      description || $('meta[property="og:description"]').attr("content");
-    description = description || null;
-
-    let image = $('meta[property="og:image"]').attr("content");
-    image = image || null;
-    console.log({
-      url: url,
-      title: title,
-      description: description,
-      image: image,
-    });
-
-    return {
-      url: url,
-      title: title,
-      description: description,
-      image: image,
-    };
   } catch (error) {
-    console.error(`Error fetching URL ${url}: ${error}`);
+    // console.error(`Error fetching URL ${url}: ${error}`);
     return null;
   }
 }
@@ -192,6 +186,40 @@ function App() {
       } catch (e) {}
     }
   }, [allCardData.length]);
+
+  const importBookmark = async () => {
+    window.chrome.bookmarks.getTree(async (data) => {
+      const list = extractBookmarks(data);
+      const updatedContent = await Promise.all(
+        list.map(async (link) => {
+          const metadata = await getUrlMetadata(link.url);
+          if (metadata) {
+            return { link: link.url, data: createCard(metadata) };
+          } else {
+            return {
+              link: link.url,
+              data: createCard({
+                url: link.url,
+                title: link.title,
+              }),
+            };
+          }
+        })
+      );
+      let allContent = [];
+      updatedContent.map((item) => {
+        if (item && item.data) {
+          allContent.push({
+            date: new Date(),
+            data: item.data,
+          });
+        }
+      });
+
+      setCardData([...cardData, ...allContent]);
+      setAllCardData([...cardData, ...allContent]);
+    });
+  };
 
   const handleaddCard = async (content) => {
     let allContent = content;
@@ -323,7 +351,7 @@ function App() {
                   <AddNewCard handleaddCard={handleaddCard} />
                 </div>
                 <div className=" col-span-3 overflow-auto max-h-[83svh]  ">
-                  {cardData && cardData.length > 0 && (
+                  {cardData && cardData.length > 0 ? (
                     <HoverEffect
                       items={cardData}
                       onDeleteCard={(newItems) => {
@@ -331,6 +359,23 @@ function App() {
                         setAllCardData(newItems);
                       }}
                     />
+                  ) : (
+                    <div className="min-h-[75svh] flex items-center justify-center ">
+                      <div className="text-center">
+                        <div className="font-extrabold text-xl mb-3 ">
+                          There are no cards added
+                        </div>
+                        <div>
+                          {/* Click Here to{" "} */}
+                          <button
+                            onClick={importBookmark}
+                            className="rounded-full border-2 border-brand-500 px-5 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-brand-600/5 active:bg-brand-700/5 dark:border-brand-400 dark:bg-brand-400/10 dark:text-white dark:hover:bg-brand-300/10 dark:active:bg-brand-200/10"
+                          >
+                            Import Bookmarks
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -341,18 +386,18 @@ function App() {
           <div className="container-wrapper bg-background ">
             <div className="container py-4">
               <div className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
-                Built b{" "}
+                Built by{" "}
                 <a
-                  href="https://twitter.com/shadcn"
+                  href="https://nilaybrahmbhatt.vercel.app/"
                   target="_blank"
                   rel="noreferrer"
                   className="font-medium underline underline-offset-4"
                 >
-                  shadcn
+                  Nilay Brahmbhatt
                 </a>
                 . The source code is available o{" "}
                 <a
-                  href="https://github.com/shadcn-ui/ui"
+                  href="https://github.com/nilaybrahmbhatt"
                   target="_blank"
                   rel="noreferrer"
                   className="font-medium underline underline-offset-4"
