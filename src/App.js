@@ -12,7 +12,7 @@ import { HoverEffect } from "./components/card-hover-effect";
 import { Input } from "./components/input";
 // import Checkbox from "./components/checkbox";
 // import { Switch } from "./components/switch";
-import { Moon, Sun } from "lucide-react";
+import { ArrowDownUp, Moon, Sun } from "lucide-react";
 // import CodeViewerGlobal from "./components/codeViewerGlobal";
 import BubbleCursor from "./components/bubble-cursor";
 import { extractBookmarks } from "./utils/utills";
@@ -151,43 +151,74 @@ function createCard(metadata) {
 }
 
 const filterButtons = ["All", "Images", "Links"];
+
 function App() {
   // const [text, setText] = useState();
   // const [nightMode, setNightMode] = useState(false);
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   // const quillRef = useRef(null); // Ref to access Quill editor instance
   const { theme, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("All");
 
+  const [sort, setSort] = useState(false);
+
   const [cardData, setCardData] = useState([]);
   const [allCardData, setAllCardData] = useState([]);
 
-  const [editorMounted, setEditorMounted] = useState(false);
+  // const [editorMounted, setEditorMounted] = useState(false);
   const [value, setValue, isPersistent, error, isInitialStateResolved] =
     useChromeStorageLocal("userNotes", "");
-
+  
   useEffect(() => {
     if (isInitialStateResolved) {
-      setEditorMounted(true);
       if (typeof value == "string") {
-        setAllCardData(JSON.parse(value));
-        setCardData(JSON.parse(value));
+        if (value != "") {
+          setCardData(JSON.parse(value));
+        }
       } else {
-        setAllCardData(value);
         setCardData(value);
       }
     }
   }, [isInitialStateResolved]);
 
   useEffect(() => {
-    if (allCardData.length > 0) {
+    const handleMessage = (request, sender, sendResponse) => {
+      if (request.action === "addTextToList") {
+        const newText = request.payload.text;
+        setCardData((prevList) => [
+          ...prevList,
+          {
+            date: new Date(),
+            data: newText,
+          },
+        ]);
+      }
+    };
+
+    window.chrome.runtime.onMessage.addListener(handleMessage);
+
+    return () => {
+      window.chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   window.chrome.contextMenus.onClicked.addListener(handleMessage);
+  //   return () => {
+  //     chrome.runtime.onMessage.removeListener(handleMessage);
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    if (cardData.length > 0) {
       try {
-        setValue(JSON.stringify(allCardData));
+        setValue(JSON.stringify(cardData));
       } catch (e) {}
     }
-  }, [allCardData.length]);
+  }, [cardData]);
 
   const importBookmark = async () => {
+    setLoading(true);
     window.chrome.bookmarks.getTree(async (data) => {
       const list = extractBookmarks(data);
       const updatedContent = await Promise.all(
@@ -217,7 +248,8 @@ function App() {
       });
 
       setCardData([...cardData, ...allContent]);
-      setAllCardData([...cardData, ...allContent]);
+      // setAllCardData([...cardData, ...allContent]);
+      setLoading(false);
     });
   };
 
@@ -259,29 +291,38 @@ function App() {
 
   const onFilterButtonClick = (filter) => {
     setFilter(filter);
+  };
+
+  const getCardData = (cardData) => {
+    let allCardData = [...cardData];
     if (filter === "All") {
-      setCardData(allCardData);
+      return allCardData;
     } else if (filter === "Images") {
-      const filteredData = allCardData.filter((item) => {
+      allCardData = cardData.filter((item) => {
         return item.data.includes("<img");
       });
-      setCardData(filteredData);
     } else if (filter === "Links") {
-      const filteredData = allCardData.filter((item) => {
-        return item.data.includes("<a");
+      allCardData = cardData.filter((item) => {
+        return item.data.includes("<a ");
       });
-      setCardData(filteredData);
-    } else if (filter === "Tasks") {
-      const filteredData = allCardData.filter((item) => {
-        return item.data.includes("<input");
-      });
-      setCardData(filteredData);
-    } else {
-      const filteredData = allCardData.filter((item) => {
-        return item.data.includes(filter);
-      });
-      setCardData(filteredData);
     }
+
+    return allCardData;
+  };
+
+  const sortedCardData = (allCardData) => {
+    if (sort) {
+      return [...allCardData].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+    }
+    console.log(allCardData);
+
+    return allCardData;
+  };
+
+  const sortData = () => {
+    setSort(!sort);
   };
 
   return (
@@ -292,9 +333,11 @@ function App() {
           <div className="container-wrapper bg-background ">
             <div className="container flex h-14 items-center gap-2 md:gap-4">
               <div className="mr-4 hidden md:flex">
-                <h5 className="font-bold  uppercase text-blue-500 ">
-                  ActionPad
-                </h5>
+                {theme === "dark" ? (
+                  <img className="h-8" src="logo-dark.png" />
+                ) : (
+                  <img className="h-8" src="logo-light.png" />
+                )}
               </div>
               <div className="ml-auto flex items-center gap-2 md:flex-1 md:justify-end">
                 <div className="">
@@ -327,6 +370,21 @@ function App() {
                     })}
                   </div>
                 </div>
+                <div className="border-l border-border/70 pl-5 border-dashed">
+                  <button
+                    onClick={sortData}
+                    className={
+                      "hover:bg-slate-700/50 p-3 rounded " +
+                      (sort ? "bg-slate-700/50" : "")
+                    }
+                  >
+                    {theme === "dark" ? (
+                      <ArrowDownUp size={16} strokeWidth={1.5} color="#fff" />
+                    ) : (
+                      <ArrowDownUp size={16} strokeWidth={1.5} color="#000" />
+                    )}
+                  </button>
+                </div>
                 <div>
                   <button
                     onClick={toggleTheme}
@@ -351,9 +409,9 @@ function App() {
                   <AddNewCard handleaddCard={handleaddCard} />
                 </div>
                 <div className=" col-span-3 overflow-auto max-h-[83svh]  ">
-                  {cardData && cardData.length > 0 ? (
+                  {getCardData(cardData) && getCardData(cardData).length > 0 ? (
                     <HoverEffect
-                      items={cardData}
+                      items={sortedCardData(getCardData(cardData))}
                       onDeleteCard={(newItems) => {
                         setCardData(newItems);
                         setAllCardData(newItems);
@@ -366,12 +424,15 @@ function App() {
                           There are no cards added
                         </div>
                         <div>
-                          {/* Click Here to{" "} */}
                           <button
                             onClick={importBookmark}
-                            className="rounded-full border-2 border-brand-500 px-5 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-brand-600/5 active:bg-brand-700/5 dark:border-brand-400 dark:bg-brand-400/10 dark:text-white dark:hover:bg-brand-300/10 dark:active:bg-brand-200/10"
+                            disabled={loading}
+                            className={
+                              "rounded-full border-2 border-brand-500 px-5 py-2 text-base font-medium text-brand-500 transition duration-200 hover:bg-brand-600/5 active:bg-brand-700/5 dark:border-brand-400 dark:bg-brand-400/10 dark:text-white dark:hover:bg-brand-300/10 dark:active:bg-brand-200/10 " +
+                              (loading ? "opacity-50 cursor-not-allowed" : "")
+                            }
                           >
-                            Import Bookmarks
+                            {!loading ? "Import Bookmarks" : "Loading..."}
                           </button>
                         </div>
                       </div>

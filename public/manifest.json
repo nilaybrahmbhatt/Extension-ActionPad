@@ -1,10 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "My New Tab Editor",
+  "name": "WritingPad - Quick Notes, Powerful Results",
   "version": "1.0",
-  "description": "A simple text editor that replaces the new tab page.",
-  "permissions": ["storage","bookmarks"],
+  "description": "Just open a new tab and throw in your tasks, notes, links, and pics",
+  "permissions": ["storage", "bookmarks", "contextMenus"],
   "chrome_url_overrides": {
     "newtab": "index.html"
+  },
+  "background": {
+    "service_worker": "eventPage.js"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   }
 }

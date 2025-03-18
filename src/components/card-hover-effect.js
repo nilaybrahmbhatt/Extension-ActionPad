@@ -62,7 +62,7 @@ export const HoverEffect = ({ items, className, onDeleteCard }) => {
                     )}
                   >
                     <div className="relative z-50">
-                      <div
+                      <div className="text-sm capitalize mb-2 font-bold text-justify"
                         dangerouslySetInnerHTML={{
                           __html: item.data,
                         }}

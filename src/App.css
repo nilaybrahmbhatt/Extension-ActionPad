@@ -244,3 +244,7 @@ body {
     max-width: 1536px;
   }
 }
+
+a h3{
+ text-decoration: underline; 
+}
