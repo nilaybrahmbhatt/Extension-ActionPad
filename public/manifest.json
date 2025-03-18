@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "WritingPad - Quick Notes, Powerful Results",
   "version": "1.0",
-  "description": "Just open a new tab and throw in your tasks, notes, links, and pics",
+  "description": "Just open a new tab and throw in your tasks, notes, links, and images",
   "permissions": ["storage", "bookmarks", "contextMenus"],
   "chrome_url_overrides": {
     "newtab": "index.html"

@@ -12,10 +12,17 @@ import { HoverEffect } from "./components/card-hover-effect";
 import { Input } from "./components/input";
 // import Checkbox from "./components/checkbox";
 // import { Switch } from "./components/switch";
-import { ArrowDownUp, Moon, Sun } from "lucide-react";
+import { ArrowDownUp, Moon, PlaneIcon, Sun } from "lucide-react";
 // import CodeViewerGlobal from "./components/codeViewerGlobal";
 import BubbleCursor from "./components/bubble-cursor";
 import { extractBookmarks } from "./utils/utills";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalTrigger,
+} from "./components/animated-modal";
 
 export const projects = [
   {
@@ -153,12 +160,11 @@ function createCard(metadata) {
 const filterButtons = ["All", "Images", "Links"];
 
 function App() {
-  // const [text, setText] = useState();
-  // const [nightMode, setNightMode] = useState(false);
   const [loading, setLoading] = useState(false);
-  // const quillRef = useRef(null); // Ref to access Quill editor instance
   const { theme, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("All");
+  
+  const [openModal, setOpenModal] = useState(false);
 
   const [sort, setSort] = useState(false);
 
@@ -166,56 +172,57 @@ function App() {
   const [allCardData, setAllCardData] = useState([]);
 
   // const [editorMounted, setEditorMounted] = useState(false);
-  const [value, setValue, isPersistent, error, isInitialStateResolved] =
-    useChromeStorageLocal("userNotes", "");
-  
-  useEffect(() => {
-    if (isInitialStateResolved) {
-      if (typeof value == "string") {
-        if (value != "") {
-          setCardData(JSON.parse(value));
-        }
-      } else {
-        setCardData(value);
-      }
+  // const [value, setValue, isPersistent, error, isInitialStateResolved] =
+  //   useChromeStorageLocal("userNotes", "");
+
+  useEffect(()=>{
+    const userNew = localStorage.getItem("usernew");
+    console.log("🚀 ~ useEffect ~ userNew:", userNew)
+    if (!userNew) {
+      setOpenModal(true);
     }
-  }, [isInitialStateResolved]);
-
-  useEffect(() => {
-    const handleMessage = (request, sender, sendResponse) => {
-      if (request.action === "addTextToList") {
-        const newText = request.payload.text;
-        setCardData((prevList) => [
-          ...prevList,
-          {
-            date: new Date(),
-            data: newText,
-          },
-        ]);
-      }
-    };
-
-    window.chrome.runtime.onMessage.addListener(handleMessage);
-
-    return () => {
-      window.chrome.runtime.onMessage.removeListener(handleMessage);
-    };
-  }, []);
+  },[])
 
   // useEffect(() => {
-  //   window.chrome.contextMenus.onClicked.addListener(handleMessage);
+  //   if (isInitialStateResolved) {
+  //     if (typeof value == "string") {
+  //       if (value != "") {
+  //         setCardData(JSON.parse(value));
+  //       }
+  //     } else {
+  //       setCardData(value);
+  //     }
+  //   }
+  // }, [isInitialStateResolved]);
+
+  // useEffect(() => {
+  //   const handleMessage = (request, sender, sendResponse) => {
+  //     if (request.action === "addTextToList") {
+  //       const newText = request.payload.text;
+  //       setCardData((prevList) => [
+  //         ...prevList,
+  //         {
+  //           date: new Date(),
+  //           data: newText,
+  //         },
+  //       ]);
+  //     }
+  //   };
+
+  //   window.chrome.runtime.onMessage.addListener(handleMessage);
+
   //   return () => {
-  //     chrome.runtime.onMessage.removeListener(handleMessage);
+  //     window.chrome.runtime.onMessage.removeListener(handleMessage);
   //   };
   // }, []);
 
-  useEffect(() => {
-    if (cardData.length > 0) {
-      try {
-        setValue(JSON.stringify(cardData));
-      } catch (e) {}
-    }
-  }, [cardData]);
+  // useEffect(() => {
+  //   if (cardData.length > 0) {
+  //     try {
+  //       setValue(JSON.stringify(cardData));
+  //     } catch (e) {}
+  //   }
+  // }, [cardData]);
 
   const importBookmark = async () => {
     setLoading(true);
@@ -472,6 +479,114 @@ function App() {
         </footer>
       </div>
       <BubbleCursor></BubbleCursor>
+
+      <Modal>
+        <ModalBody open={openModal} setOpen={(e)=>{
+          setOpenModal(e)
+        }} >
+          <ModalContent>
+            <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-2">
+              Welcome to WritingPad <br />
+            </h4>
+              <div className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 border border-gray-200">
+              Just open a new tab and throw in your tasks, notes, links, and images
+              </div>
+            <div className="flex justify-center items-center">
+              {/* {images.map((image, idx) => (
+                <motion.div
+                  key={"images" + idx}
+                  style={{
+                    rotate: Math.random() * 20 - 10,
+                  }}
+                  whileHover={{
+                    scale: 1.1,
+                    rotate: 0,
+                    zIndex: 100,
+                  }}
+                  whileTap={{
+                    scale: 1.1,
+                    rotate: 0,
+                    zIndex: 100,
+                  }}
+                  className="rounded-xl -mr-4 mt-4 p-1 bg-white dark:bg-neutral-800 dark:border-neutral-700 border border-neutral-100 shrink-0 overflow-hidden"
+                >
+                  <Image
+                    src={image}
+                    alt="bali images"
+                    width="500"
+                    height="500"
+                    className="rounded-lg h-20 w-20 md:h-40 md:w-40 object-cover shrink-0"
+                  />
+                </motion.div>
+              ))} */}
+            </div>
+            <div className="py-10 flex flex-wrap gap-x-4 gap-y-6 items-start justify-start max-w-sm mx-auto">
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  1 Drag & Drop Text/Images
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Add your Notes/Tasks/Images from web
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Filter by Categories
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Sort your data
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Change your UI theme
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Amazing Animated UI
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Decorate your text according to your priority
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Do not download your fav images, Paste & store Images here
+                </span>
+              </div>
+              <div className="flex  items-center justify-center">
+                <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
+                <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                  Write click to add any images, paragraph here from any page
+                </span>
+              </div>
+            </div>
+          </ModalContent>
+          <ModalFooter className="gap-4">
+            <button className="px-2 py-1 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm w-28">
+              Cancel
+            </button>
+            <button className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28">
+              Book Now
+            </button>
+          </ModalFooter>
+        </ModalBody>
+      </Modal>
     </div>
   );
 
