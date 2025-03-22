@@ -58,12 +58,12 @@ export const ModalBody = ({ children, className, open, setOpen }) => {
     }
   }, [open]);
 
-  const modalRef = useRef(null);
-  useOutsideClick(modalRef, () => {
-    console.log('asds');
-    setOpen(false)
+  // const modalRef = useRef(null);
+  // useOutsideClick(modalRef, () => {
+  //   console.log('asds');
+  //   setOpen(false)
     
-  });
+  // });
 
   return (
     <AnimatePresence>
@@ -85,7 +85,6 @@ export const ModalBody = ({ children, className, open, setOpen }) => {
           <Overlay />
 
           <motion.div
-            ref={modalRef}
             className={cn(
               "min-h-[60%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden",
               className
@@ -134,7 +133,7 @@ export const ModalFooter = ({ children, className }) => {
   return (
     <div
       className={cn(
-        "flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
+        "flex justify-center p-4 bg-gray-100 dark:bg-neutral-900",
         className
       )}
     >

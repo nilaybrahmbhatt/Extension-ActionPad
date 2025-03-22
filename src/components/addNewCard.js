@@ -96,35 +96,8 @@ export default function AddNewCard(props) {
       </div>
       <div className="p-5">
         <div>
-          {/* <div className="flex gap-5">
-            <Switch label="is task?" checked={isTask} setChecked={setIsTask} />
-            {isTask && (
-              <input
-                type="date"
-                placeholder="Enter Date if this is task"
-                className="flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-              ></input>
-            )}
-          </div> */}
-          <Button onClick={() => {
-              handleaddCard(text);
-              setText("");
-            }}
-            containerClassName="h-10 w-full"
-            className="transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none w-full"
-            >
-            Add Note
-          </Button>
-          
-          {/* <HoverBorderGradient
-            containerClassName="rounded-full w-full"
-            as="button"
-            className="w-full"
-          >
-            Add New Action
-          </HoverBorderGradient> */}
 
-          {/* <button
+          <button
             onClick={() => {
               handleaddCard(text);
               setText("");
@@ -132,7 +105,7 @@ export default function AddNewCard(props) {
             className=" mt-5 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"
           >
             Add Note
-          </button> */}
+          </button>
         </div>
       </div>
     </div>

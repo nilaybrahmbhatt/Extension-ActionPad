@@ -1,47 +1,49 @@
-import { PlaneIcon } from "lucide-react";
+import {
+  ArrowDownUp,
+  ClipboardPaste,
+  Grip,
+  Highlighter,
+  ListFilterPlus,
+  Palette,
+  PlaneIcon,
+  ScanSearch,
+  SquareDashedMousePointer,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { Modal, ModalBody, ModalContent, ModalFooter } from "./animated-modal";
 
 const featureList = [
   {
     title: "Effortlessly Drag & Drop Text and Images",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    icon: <Grip />,
   },
   {
     title: "Seamlessly Capture Notes, Tasks, and Images from the Web",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    icon: <ScanSearch />,
   },
   {
     title: "Organize with Precision: Filter by Categories",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    icon: <ListFilterPlus />,
   },
   {
-    title: "Stay in Control: Sort Your Data for Optimal Efficiency",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Sort Your Data for Optimal Efficiency",
+    icon: <ArrowDownUp />,
   },
   {
-    title: "Personalize Your Experience: Customize Your UI Theme",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Customize Your UI Theme",
+    icon: <Palette />,
   },
   {
-    title: "Prioritize Visually: Decorate Text to Highlight Key Information",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Decorate Text to Highlight Key Information",
+    icon: <Highlighter />,
   },
   {
-    title: "Simplify Image Management: Paste and Store Images Directly",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Paste and Store Images Directly",
+    icon: <ClipboardPaste />,
   },
   {
     title: "Effortless Content Capture: Right-Click to Add Images and Text",
-    image:
-      "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    icon: <SquareDashedMousePointer />,
   },
 ];
 
@@ -55,14 +57,14 @@ export default function GettingStartedModal({ openModal, setOpenModal }) {
         }}
       >
         <ModalContent>
-          <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-2">
+          <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center">
             Welcome to WritingPad <br />
           </h4>
-          <div className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 border border-gray-200">
+          <div className="px-1 py-0.5 text-muted-foreground rounded-md  border-border/70 border-b border-dashed pb-5  ">
             Just open a new tab and throw in your tasks, notes, links, and
             images
           </div>
-          <div className="grid grid-cols-4 gap-5 mt-5">
+          <div className="grid grid-cols-4 gap-5">
             {featureList.map((item) => {
               return (
                 <motion.div
@@ -72,7 +74,17 @@ export default function GettingStartedModal({ openModal, setOpenModal }) {
                     zIndex: 100,
                   }}
                 >
-                  <img src={item.image} className="rounded mb-2" />
+                  {item.icon ? (
+                    <div className="min-h-16 items-center justify-center flex ">
+                      {item.icon}
+                    </div>
+                  ) : (
+                    <img
+                      src={item.image}
+                      className="rounded mb-2 h-24 w-full bg-black object-contain "
+                    />
+                  )}
+                  {/* <img src={item.image} className="rounded mb-2 h-24 w-full bg-black object-contain " /> */}
                   <h4 className="text-xs font-bold text-muted-foreground text-center">
                     {item.title}
                   </h4>
@@ -80,65 +92,12 @@ export default function GettingStartedModal({ openModal, setOpenModal }) {
               );
             })}
           </div>
-          {/* <div className="py-10 flex flex-wrap gap-x-4 gap-y-6 items-start justify-start max-w-sm mx-auto">
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Drag & Drop Text/Images
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Add your Notes/Tasks/Images from web
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Filter by Categories
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Sort your data
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Change your UI theme
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Amazing Animated UI
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Decorate your text according to your priority
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Do not download your fav images, Paste & store Images here
-              </span>
-            </div>
-            <div className="flex  items-center justify-center">
-              <PlaneIcon className="mr-1 text-neutral-700 dark:text-neutral-300 h-4 w-4" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Write click to add any images, paragraph here from any page
-              </span>
-            </div>
-          </div> */}
         </ModalContent>
         <ModalFooter className="gap-4">
-          <button onClick={()=>setOpenModal(false)} className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28">
+          <button
+            onClick={() => setOpenModal(false)}
+            className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-3 rounded-md border border-black w-36"
+          >
             Let's Start
           </button>
         </ModalFooter>

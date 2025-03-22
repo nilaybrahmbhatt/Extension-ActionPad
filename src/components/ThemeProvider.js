@@ -15,7 +15,7 @@ export const ThemeProvider = ({ children }) => {
         ? "dark"
         : "light";
     }
-    return "light"; // Default if media query not supported
+    return "light";
   };
 
   // State for the theme (light/dark)
@@ -52,6 +52,13 @@ export const ThemeProvider = ({ children }) => {
     if (typeof window !== "undefined") {
       document.documentElement.setAttribute("data-theme", theme);
     }
+
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (event) => {
+        const theme = event.matches ? "dark" : "light";
+        setTheme(theme);
+      });
   }, []);
 
   // Value to be provided by the context
