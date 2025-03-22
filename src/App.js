@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "./App.css";
 import * as Cheerio from "cheerio";
 import { useChromeStorageLocal } from "use-chrome-storage";
@@ -13,49 +13,10 @@ import BubbleCursor from "./components/bubble-cursor";
 import { extractBookmarks } from "./utils/utills";
 import GettingStartedModal from "./components/gettingStartedModal";
 
-export const projects = [
-  {
-    title: "Stripe",
-    description:
-      "A technology company that builds economic infrastructure for the internet.",
-    link: "https://stripe.com",
-  },
-  {
-    title: "Netflix",
-    description:
-      "A streaming service that offers a wide variety of award-winning TV shows, movies, anime, documentaries, and more on thousands of internet-connected devices.",
-    link: "https://netflix.com",
-  },
-  {
-    title: "Google",
-    description:
-      "A multinational technology company that specializes in Internet-related services and products.",
-    link: "https://google.com",
-  },
-  {
-    title: "Meta",
-    description:
-      "A technology company that focuses on building products that advance Facebook's mission of bringing the world closer together.",
-    link: "https://meta.com",
-  },
-  {
-    title: "Amazon",
-    description:
-      "A multinational technology company focusing on e-commerce, cloud computing, digital streaming, and artificial intelligence.",
-    link: "https://amazon.com",
-  },
-  {
-    title: "Microsoft",
-    description:
-      "A multinational technology company that develops, manufactures, licenses, supports, and sells computer software, consumer electronics, personal computers, and related services.",
-    link: "https://microsoft.com",
-  },
-];
-
-const BgContainer = () => {
+const BgContainer = React.memo(() => {
   return (
     <div className="absolute inset-0  -z-10 ">
-      <svg class=" w-full h-full border-y border-dashed border-border stroke-border/70 ">
+      <svg className="w-full h-full border-y border-dashed border-border stroke-border/70 ">
         <defs>
           <pattern
             id="diagonal-footer-pattern"
@@ -91,13 +52,14 @@ const BgContainer = () => {
       </svg>
     </div>
   );
-};
+});
 
 async function getUrlMetadata(url) {
   try {
     const response = await axios.get(url); // Adjust timeout as needed
 
     if (response.status >= 400) {
+      return null;
     } else {
       const $ = Cheerio.load(response.data); // Load the HTML into cheerio
       const title = $("title").text() || null;
@@ -121,6 +83,7 @@ async function getUrlMetadata(url) {
     return null;
   }
 }
+
 function createCard(metadata) {
   if (!metadata) {
     return "<!-- Card Creation Failed (No Metadata) -->";
@@ -156,7 +119,7 @@ function App() {
   const [openModal, setOpenModal] = useState(false);
 
   const [sort, setSort] = useState(true);
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState("");
 
   const [cardData, setCardData] = useState([]);
   const [allCardData, setAllCardData] = useState([]);
@@ -175,14 +138,14 @@ function App() {
   useEffect(() => {
     if (isInitialStateResolved) {
       if (typeof value == "string") {
-        if (value != "") {
+        if (value !== "") {
           setCardData(JSON.parse(value));
         }
       } else {
         setCardData(value);
       }
     }
-  }, [isInitialStateResolved]);
+  }, [isInitialStateResolved, value]);
 
   useEffect(() => {
     const handleMessage = (request, sender, sendResponse) => {
@@ -211,9 +174,9 @@ function App() {
         setValue(JSON.stringify(cardData));
       } catch (e) {}
     }
-  }, [cardData]);
+  }, [cardData, setValue]);
 
-  const importBookmark = async () => {
+  const importBookmark = useCallback(async () => {
     setLoading(true);
     window.chrome.bookmarks.getTree(async (data) => {
       const list = extractBookmarks(data);
@@ -234,7 +197,7 @@ function App() {
         })
       );
       let allContent = [];
-      updatedContent.map((item) => {
+      updatedContent.forEach((item) => {
         if (item && item.data) {
           allContent.push({
             date: new Date(),
@@ -243,33 +206,48 @@ function App() {
         }
       });
 
-      setCardData([...cardData, ...allContent]);
-      // setAllCardData([...cardData, ...allContent]);
+      setCardData((prevCardData) => [...prevCardData, ...allContent]);
       setLoading(false);
     });
-  };
+  }, []);
 
-  const handleaddCard = async (content) => {
-    let allContent = content;
-    let links = extractFullLinks(allContent);
-    if (links && links.length > 0) {
-      const updatedContent = await Promise.all(
-        links.map(async (link) => {
-          const metadata = await getUrlMetadata(link);
-          return { link, data: createCard(metadata) };
-        })
-      );
-      updatedContent.map((item) => {
-        allContent = allContent.replace(item.link, item.data);
-      });
-      setCardData([...cardData, { date: new Date(), data: allContent }]);
-      setAllCardData([...cardData, { date: new Date(), data: allContent }]);
-    } else {
-      setCardData([...cardData, { date: new Date(), data: content }]);
-      setAllCardData([...cardData, { date: new Date(), data: content }]);
-    }
-  };
-  function extractFullLinks(text) {
+  const handleaddCard = useCallback(
+    async (content) => {
+      let allContent = content;
+      let links = extractFullLinks(allContent);
+      if (links && links.length > 0) {
+        const updatedContent = await Promise.all(
+          links.map(async (link) => {
+            const metadata = await getUrlMetadata(link);
+            return { link, data: createCard(metadata) };
+          })
+        );
+        updatedContent.forEach((item) => {
+          allContent = allContent.replace(item.link, item.data);
+        });
+        setCardData((prevCardData) => [
+          ...prevCardData,
+          { date: new Date(), data: allContent },
+        ]);
+        setAllCardData((prevCardData) => [
+          ...prevCardData,
+          { date: new Date(), data: allContent },
+        ]);
+      } else {
+        setCardData((prevCardData) => [
+          ...prevCardData,
+          { date: new Date(), data: content },
+        ]);
+        setAllCardData((prevCardData) => [
+          ...prevCardData,
+          { date: new Date(), data: content },
+        ]);
+      }
+    },
+    [setCardData, setAllCardData]
+  );
+
+  const extractFullLinks = useCallback((text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     let links = [];
 
@@ -283,46 +261,54 @@ function App() {
     }
 
     return links ? links : [];
-  }
+  }, []);
 
-  const onFilterButtonClick = (filter) => {
+  const onFilterButtonClick = useCallback((filter) => {
     setFilter(filter);
-  };
+  }, []);
 
-  const getCardData = (cardData) => {
-    let allCardData = [...cardData];
-    if (filter === "All") {
+  const getCardData = useCallback(
+    (cardData) => {
+      let allCardData = [...cardData];
+      if (search) {
+        allCardData = allCardData.filter((item) => {
+          return item.data.toLowerCase().includes(search.toLowerCase());
+        });
+      }
+
+      if (filter === "All") {
+        return allCardData;
+      } else if (filter === "Images") {
+        allCardData = cardData.filter((item) => {
+          return item.data.includes("<img");
+        });
+      } else if (filter === "Links") {
+        allCardData = cardData.filter((item) => {
+          return item.data.includes("<a ");
+        });
+      }
+
       return allCardData;
-    } else if (filter === "Images") {
-      allCardData = cardData.filter((item) => {
-        return item.data.includes("<img");
-      });
-    } else if (filter === "Links") {
-      allCardData = cardData.filter((item) => {
-        return item.data.includes("<a ");
-      });
-    }
-    if (search) {
-      allCardData = allCardData.filter((item) => {
-        return item.data.toLowerCase().includes(value.toLowerCase());
-      });
-    }
-    return allCardData;
-  };
+    },
+    [search, filter]
+  );
 
-  const sortedCardData = (allCardData) => {
-    if (sort) {
-      return [...allCardData].sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-    }
+  const sortedCardData = useCallback(
+    (allCardData) => {
+      if (sort) {
+        return [...allCardData].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+      }
 
-    return allCardData;
-  };
+      return allCardData;
+    },
+    [sort]
+  );
 
-  const sortData = () => {
-    setSort(!sort);
-  };
+  const sortData = useCallback(() => {
+    setSort((prevSort) => !prevSort);
+  }, []);
 
   return (
     <div className={`relative flex min-h-svh flex-col`}>
@@ -346,13 +332,7 @@ function App() {
                       type="search"
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (value) {
-                          setSearch(value);
-                        }
-                        // const filteredData = allCardData.filter((item) => {
-                        //   return item.data.toLowerCase().includes(value.toLowerCase());
-                        // });
-                        // setCardData(filteredData);
+                        setSearch(value);
                       }}
                     />
 
@@ -478,71 +458,11 @@ function App() {
         openModal={openModal}
         setOpenModal={() => {
           localStorage.setItem("GettingStarted", "true");
-          setOpenModal();
+          setOpenModal(false);
         }}
       />
     </div>
   );
-
-  // return (
-  //   <div
-  //     className={`dark:bg-black min-h-screen  ${
-  //       theme === "dark" ? "dark-mode" : ""
-  //     }`}
-  //   >
-  //     <div className="w-full border-b border-[#27272a] border-dashed px-5 py-2 ">
-  //       <h5 className="text-lg dark:text-white font-extrabold font-roboto">
-  //         ActionPad
-  //       </h5>
-  //     </div>
-  //     <div className="border-x border-x-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 max-lg:hidden dark:[--pattern-fg:var(--color-white)]/10">
-  //       sdsd
-  //     </div>
-  //     {/* <div className="card-container">
-  //       <div className="card p-0">
-  //         <h5>Your Notes</h5>
-  //         <ReactQuill
-  //           ref={quillRef}
-  //           modules={{
-  //             toolbar: [
-  //               [{ header: [1, 2, false] }],
-  //               ["bold", "italic", "underline", "strike", "blockquote"],
-  //               [
-  //                 { list: "ordered" },
-  //                 { list: "bullet" },
-  //                 { indent: "-1" },
-  //                 { indent: "+1" },
-  //               ],
-  //               ["link", "image"],
-  //             ],
-  //             syntax: false,
-  //             clipboard: {
-  //               matchVisual: true,
-  //             },
-  //           }}
-  //           className="editor"
-  //           theme="snow"
-  //           defaultValue={text}
-  //           onChange={handleChange}
-  //         />
-  //       </div>
-  //       <div className="card">
-  //         <h2>Card 2</h2>
-  //         <p>
-  //           This is the content of card 2. It fills the entire height of the
-  //           card. You can put more content here.
-  //         </p>
-  //       </div>
-  //       <div className="card">
-  //         <h2>Card 3</h2>
-  //         <p>
-  //           This is the content of card 3. It fills the entire height of the
-  //           card.
-  //         </p>
-  //       </div>
-  //     </div> */}
-  //   </div>
-  // );
 }
 
 export default App;
