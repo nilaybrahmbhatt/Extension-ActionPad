@@ -5,7 +5,7 @@ let currentContexts = defaultContexts;
 function createContextMenu(contexts) {
   chrome.contextMenus.create({
     id: "WritingpadSelection",
-    title: "Add to WritingPad",
+    title: "Save To WritingPad",
     contexts: contexts, // Use the specified contexts
   });
 }

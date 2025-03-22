@@ -1,29 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "motion/react";
 import "./App.css";
 import * as Cheerio from "cheerio";
-// import { generatePdf } from "./utils/pdfGenerator";
 import { useChromeStorageLocal } from "use-chrome-storage";
-// import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.bubble.css";
 import { useTheme } from "./components/ThemeProvider";
 import AddNewCard from "./components/addNewCard";
 import axios from "axios";
 import { HoverEffect } from "./components/card-hover-effect";
 import { Input } from "./components/input";
-// import Checkbox from "./components/checkbox";
-// import { Switch } from "./components/switch";
 import { ArrowDownUp, Moon, PlaneIcon, Sun } from "lucide-react";
-// import CodeViewerGlobal from "./components/codeViewerGlobal";
 import BubbleCursor from "./components/bubble-cursor";
 import { extractBookmarks } from "./utils/utills";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalTrigger,
-} from "./components/animated-modal";
 import GettingStartedModal from "./components/gettingStartedModal";
 
 export const projects = [
@@ -161,14 +148,6 @@ function createCard(metadata) {
 
 const filterButtons = ["All", "Images", "Links"];
 
-const images = [
-  "https://images.unsplash.com/photo-1517322048670-4fba75cbbb62?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1573790387438-4da905039392?q=80&w=3425&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1555400038-63f5ba517a47?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1554931670-4ebfabf6e7a9?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1546484475-7f7bd55792da?q=80&w=2581&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-];
-
 function App() {
   const [loading, setLoading] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -176,14 +155,15 @@ function App() {
 
   const [openModal, setOpenModal] = useState(false);
 
-  const [sort, setSort] = useState(false);
+  const [sort, setSort] = useState(true);
+  const [search, setSearch] = useState();
 
   const [cardData, setCardData] = useState([]);
   const [allCardData, setAllCardData] = useState([]);
 
-  // const [editorMounted, setEditorMounted] = useState(false);
-  // const [value, setValue, isPersistent, error, isInitialStateResolved] =
-  //   useChromeStorageLocal("userNotes", "");
+  const [editorMounted, setEditorMounted] = useState(false);
+  const [value, setValue, isPersistent, error, isInitialStateResolved] =
+    useChromeStorageLocal("userNotes", "");
 
   useEffect(() => {
     const userNew = localStorage.getItem("GettingStarted");
@@ -192,46 +172,46 @@ function App() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (isInitialStateResolved) {
-  //     if (typeof value == "string") {
-  //       if (value != "") {
-  //         setCardData(JSON.parse(value));
-  //       }
-  //     } else {
-  //       setCardData(value);
-  //     }
-  //   }
-  // }, [isInitialStateResolved]);
+  useEffect(() => {
+    if (isInitialStateResolved) {
+      if (typeof value == "string") {
+        if (value != "") {
+          setCardData(JSON.parse(value));
+        }
+      } else {
+        setCardData(value);
+      }
+    }
+  }, [isInitialStateResolved]);
 
-  // useEffect(() => {
-  //   const handleMessage = (request, sender, sendResponse) => {
-  //     if (request.action === "addTextToList") {
-  //       const newText = request.payload.text;
-  //       setCardData((prevList) => [
-  //         ...prevList,
-  //         {
-  //           date: new Date(),
-  //           data: newText,
-  //         },
-  //       ]);
-  //     }
-  //   };
+  useEffect(() => {
+    const handleMessage = (request, sender, sendResponse) => {
+      if (request.action === "addTextToList") {
+        const newText = request.payload.text;
+        setCardData((prevList) => [
+          ...prevList,
+          {
+            date: new Date(),
+            data: newText,
+          },
+        ]);
+      }
+    };
 
-  //   window.chrome.runtime.onMessage.addListener(handleMessage);
+    window.chrome.runtime.onMessage.addListener(handleMessage);
 
-  //   return () => {
-  //     window.chrome.runtime.onMessage.removeListener(handleMessage);
-  //   };
-  // }, []);
+    return () => {
+      window.chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, []);
 
-  // useEffect(() => {
-  //   if (cardData.length > 0) {
-  //     try {
-  //       setValue(JSON.stringify(cardData));
-  //     } catch (e) {}
-  //   }
-  // }, [cardData]);
+  useEffect(() => {
+    if (cardData.length > 0) {
+      try {
+        setValue(JSON.stringify(cardData));
+      } catch (e) {}
+    }
+  }, [cardData]);
 
   const importBookmark = async () => {
     setLoading(true);
@@ -322,7 +302,11 @@ function App() {
         return item.data.includes("<a ");
       });
     }
-
+    if (search) {
+      allCardData = allCardData.filter((item) => {
+        return item.data.toLowerCase().includes(value.toLowerCase());
+      });
+    }
     return allCardData;
   };
 
@@ -332,7 +316,6 @@ function App() {
         (a, b) => new Date(b.date) - new Date(a.date)
       );
     }
-    console.log(allCardData);
 
     return allCardData;
   };
@@ -363,10 +346,13 @@ function App() {
                       type="search"
                       onChange={(e) => {
                         const value = e.target.value;
-                        const filteredData = allCardData.filter((item) => {
-                          return item.data.includes(value);
-                        });
-                        setCardData(filteredData);
+                        if (value) {
+                          setSearch(value);
+                        }
+                        // const filteredData = allCardData.filter((item) => {
+                        //   return item.data.toLowerCase().includes(value.toLowerCase());
+                        // });
+                        // setCardData(filteredData);
                       }}
                     />
 
@@ -490,9 +476,9 @@ function App() {
       <BubbleCursor></BubbleCursor>
       <GettingStartedModal
         openModal={openModal}
-        setOpenModal={()=>{
-          localStorage.setItem("GettingStarted",'true')
-          setOpenModal()
+        setOpenModal={() => {
+          localStorage.setItem("GettingStarted", "true");
+          setOpenModal();
         }}
       />
     </div>
