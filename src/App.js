@@ -122,7 +122,7 @@ function App() {
   const [search, setSearch] = useState("");
 
   const [cardData, setCardData] = useState([]);
-  const [allCardData, setAllCardData] = useState([]);
+  // const [allCardData, setAllCardData] = useState([]);
 
   const [editorMounted, setEditorMounted] = useState(false);
   const [value, setValue, isPersistent, error, isInitialStateResolved] =
@@ -229,22 +229,16 @@ function App() {
           ...prevCardData,
           { date: new Date(), data: allContent },
         ]);
-        setAllCardData((prevCardData) => [
-          ...prevCardData,
-          { date: new Date(), data: allContent },
-        ]);
+        
       } else {
         setCardData((prevCardData) => [
           ...prevCardData,
           { date: new Date(), data: content },
         ]);
-        setAllCardData((prevCardData) => [
-          ...prevCardData,
-          { date: new Date(), data: content },
-        ]);
+        
       }
     },
-    [setCardData, setAllCardData]
+    [setCardData]
   );
 
   const extractFullLinks = useCallback((text) => {
@@ -396,7 +390,7 @@ function App() {
                       items={sortedCardData(getCardData(cardData))}
                       onDeleteCard={(newItems) => {
                         setCardData(newItems);
-                        setAllCardData(newItems);
+                        // setAllCardData(newItems);
                       }}
                     />
                   ) : (

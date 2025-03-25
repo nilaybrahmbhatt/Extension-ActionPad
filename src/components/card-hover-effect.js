@@ -35,7 +35,7 @@ export const HoverEffect = ({ items, className, onDeleteCard }) => {
               return (
                 <div
                   key={id}
-                  className="relative p-2"
+                  className="relative p-2 user_card "
                   onMouseEnter={() => setHoveredIndex(id + "-" + idx)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
@@ -62,7 +62,7 @@ export const HoverEffect = ({ items, className, onDeleteCard }) => {
                     )}
                   >
                     <div className="relative z-50">
-                      <div className="text-sm capitalize mb-2 font-bold text-justify"
+                      <div className="text-sm capitalize mb-2 font-bold "
                         dangerouslySetInnerHTML={{
                           __html: item.data,
                         }}
