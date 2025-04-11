@@ -57,9 +57,10 @@ const BgContainer = React.memo(() => {
 async function getUrlMetadata(url) {
   try {
     const response = await axios.get(url); // Adjust timeout as needed
-
     if (response.status >= 400) {
-      return null;
+      return {
+        url: url,
+      };
     } else {
       const $ = Cheerio.load(response.data); // Load the HTML into cheerio
       const title = $("title").text() || null;
@@ -80,13 +81,21 @@ async function getUrlMetadata(url) {
     }
   } catch (error) {
     // console.error(`Error fetching URL ${url}: ${error}`);
-    return null;
+    return {
+      url: url,
+    };
   }
 }
 
 function createCard(metadata) {
-  if (!metadata) {
-    return "<!-- Card Creation Failed (No Metadata) -->";
+  if (!metadata.title) {
+    return `
+    <div class="card">
+      <a href="${metadata.url}" target="_blank" rel="noopener noreferrer">
+        <h3 class="text-sm capitalize mb-2 font-bold text-justify " >${metadata.url}</h3>
+      </a>
+    </div>
+  `;
   }
 
   const html = `
@@ -124,57 +133,57 @@ function App() {
   const [cardData, setCardData] = useState([]);
   // const [allCardData, setAllCardData] = useState([]);
 
-  const [editorMounted, setEditorMounted] = useState(false);
-  const [value, setValue, isPersistent, error, isInitialStateResolved] =
-    useChromeStorageLocal("userNotes", "");
+  // const [editorMounted, setEditorMounted] = useState(false);
+  // const [value, setValue, isPersistent, error, isInitialStateResolved] =
+  //   useChromeStorageLocal("userNotes", "");
 
-  useEffect(() => {
-    const userNew = localStorage.getItem("GettingStarted");
-    if (!userNew) {
-      setOpenModal(true);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const userNew = localStorage.getItem("GettingStarted");
+  //   if (!userNew) {
+  //     setOpenModal(true);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    if (isInitialStateResolved) {
-      if (typeof value == "string") {
-        if (value !== "") {
-          setCardData(JSON.parse(value));
-        }
-      } else {
-        setCardData(value);
-      }
-    }
-  }, [isInitialStateResolved, value]);
+  // useEffect(() => {
+  //   if (isInitialStateResolved) {
+  //     if (typeof value == "string") {
+  //       if (value !== "") {
+  //         setCardData(JSON.parse(value));
+  //       }
+  //     } else {
+  //       setCardData(value);
+  //     }
+  //   }
+  // }, [isInitialStateResolved, value]);
 
-  useEffect(() => {
-    const handleMessage = (request, sender, sendResponse) => {
-      if (request.action === "addTextToList") {
-        const newText = request.payload.text;
-        setCardData((prevList) => [
-          ...prevList,
-          {
-            date: new Date(),
-            data: newText,
-          },
-        ]);
-      }
-    };
+  // useEffect(() => {
+  //   const handleMessage = (request, sender, sendResponse) => {
+  //     if (request.action === "addTextToList") {
+  //       const newText = request.payload.text;
+  //       setCardData((prevList) => [
+  //         ...prevList,
+  //         {
+  //           date: new Date(),
+  //           data: newText,
+  //         },
+  //       ]);
+  //     }
+  //   };
+  //   window.hljs.highlightAll();
+  //   window.chrome.runtime.onMessage.addListener(handleMessage);
 
-    window.chrome.runtime.onMessage.addListener(handleMessage);
+  //   return () => {
+  //     window.chrome.runtime.onMessage.removeListener(handleMessage);
+  //   };
+  // }, []);
 
-    return () => {
-      window.chrome.runtime.onMessage.removeListener(handleMessage);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (cardData.length > 0) {
-      try {
-        setValue(JSON.stringify(cardData));
-      } catch (e) {}
-    }
-  }, [cardData, setValue]);
+  // useEffect(() => {
+  //   if (cardData.length > 0) {
+  //     try {
+  //       setValue(JSON.stringify(cardData));
+  //     } catch (e) {}
+  //   }
+  // }, [cardData, setValue]);
 
   const importBookmark = useCallback(async () => {
     setLoading(true);
@@ -216,12 +225,16 @@ function App() {
       let allContent = content;
       let links = extractFullLinks(allContent);
       if (links && links.length > 0) {
+        console.log("links", links);
+
         const updatedContent = await Promise.all(
           links.map(async (link) => {
             const metadata = await getUrlMetadata(link);
+            console.log("🚀 ~ links.map ~ metadata:", metadata);
             return { link, data: createCard(metadata) };
           })
         );
+        console.log("🚀 ~ updatedContent:", updatedContent);
         updatedContent.forEach((item) => {
           allContent = allContent.replace(item.link, item.data);
         });
@@ -229,13 +242,11 @@ function App() {
           ...prevCardData,
           { date: new Date(), data: allContent },
         ]);
-        
       } else {
         setCardData((prevCardData) => [
           ...prevCardData,
           { date: new Date(), data: content },
         ]);
-        
       }
     },
     [setCardData]

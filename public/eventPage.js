@@ -27,3 +27,4 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
 });
+// window.hljs.highlightAll();

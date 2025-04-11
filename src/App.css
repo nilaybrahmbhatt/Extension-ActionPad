@@ -44,8 +44,8 @@
   --sidebar-accent-foreground: 240 5.9% 10%;
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 240 5% 64.9%;
-  --scrollbar-thumb: theme('colors.gray.500');
-  --scrollbar-track: theme('colors.gray.200');
+  --scrollbar-thumb: theme("colors.gray.500");
+  --scrollbar-track: theme("colors.gray.200");
 }
 
 .dark {
@@ -81,17 +81,16 @@
   --sidebar-accent-foreground: 240 4.8% 95.9%;
   --sidebar-border: 240 3.7% 15.9%;
   --sidebar-ring: 240 4.9% 83.9%;
-  --scrollbar-thumb: theme('colors.gray.700');
-  --scrollbar-track: theme('colors.gray.900');
+  --scrollbar-thumb: theme("colors.gray.700");
+  --scrollbar-track: theme("colors.gray.900");
 }
-
 
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
- *::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   @apply bg-gray-200 dark:bg-gray-900 rounded-full;
 }
 
@@ -105,14 +104,12 @@
 
 .global-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: theme('colors.gray.500') theme('colors.gray.200'); /* thumb, track */
+  scrollbar-color: theme("colors.gray.500") theme("colors.gray.200"); /* thumb, track */
 }
 
-.dark .global-scrollbar{
-    scrollbar-color: theme('colors.gray.700') theme('colors.gray.900');
+.dark .global-scrollbar {
+  scrollbar-color: theme("colors.gray.700") theme("colors.gray.900");
 }
-
-
 
 html {
   scroll-behavior: smooth;
@@ -150,7 +147,7 @@ body {
 }
 .ql-snow .ql-fill,
 .ql-snow .ql-stroke.ql-fill {
-  fill:  hsl(var(--foreground)) !important;
+  fill: hsl(var(--foreground)) !important;
 }
 /* .quill.editor {
   display: flex;
@@ -245,18 +242,65 @@ body {
   }
 }
 
-a h3{
- text-decoration: underline; 
+a h3 {
+  text-decoration: underline;
 }
 
-menu, ol, ul{
-    list-style: auto !important;
-    margin: 0px 30px !important;
-    padding: inherit !important;
+menu,
+ol,
+ul {
+  list-style: auto !important;
+  margin: 0px 30px !important;
+  padding: inherit !important;
 }
-.user_card h1{
+.user_card h1 {
   font-size: 18px;
 }
-.user_card h2{
+.user_card h2 {
   font-size: 16px;
+}
+
+/* Custom Theme for highlight.js */
+
+.hljs {
+  display: block;
+  padding: 0.5em;
+  background: #f5f5f5;
+  color: #333;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #777;
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-name {
+  color: #007acc;
+}
+.hljs-attribute,
+.hljs-meta {
+  color: #f08d49;
+}
+.hljs-number,
+.hljs-regexp,
+.hljs-link {
+  color: #d36363;
+}
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-subst {
+  color: #50a14f;
+}
+.hljs-title,
+.hljs-section {
+  color: #4078f2;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
 }

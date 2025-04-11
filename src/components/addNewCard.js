@@ -15,6 +15,7 @@ export default function AddNewCard(props) {
   const [isTask, setIsTask] = useState(false);
 
   const handleChange = (content, delta, source, editor) => {
+    console.log(content, delta, source, editor);
     setText(content);
   };
   const handleDragEnterPage = (e) => {
@@ -57,6 +58,7 @@ export default function AddNewCard(props) {
         <ReactQuill
           ref={quillRef}
           modules={{
+
             toolbar: [
               [{ header: "1" }, { header: "2" }],
               [
@@ -83,6 +85,7 @@ export default function AddNewCard(props) {
               ["image", "clean"],
               [],
             ],
+            // syntax: { hljs: window.hljs },
             syntax: false,
             clipboard: {
               matchVisual: true,
@@ -99,6 +102,7 @@ export default function AddNewCard(props) {
 
           <button
             onClick={() => {
+              console.log(text);
               handleaddCard(text);
               setText("");
             }}
