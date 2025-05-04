@@ -131,59 +131,59 @@ function App() {
   const [search, setSearch] = useState("");
 
   const [cardData, setCardData] = useState([]);
-  // const [allCardData, setAllCardData] = useState([]);
+  const [allCardData, setAllCardData] = useState([]);
 
-  // const [editorMounted, setEditorMounted] = useState(false);
-  // const [value, setValue, isPersistent, error, isInitialStateResolved] =
-  //   useChromeStorageLocal("userNotes", "");
+  const [editorMounted, setEditorMounted] = useState(false);
+  const [value, setValue, isPersistent, error, isInitialStateResolved] =
+    useChromeStorageLocal("userNotes", "");
 
-  // useEffect(() => {
-  //   const userNew = localStorage.getItem("GettingStarted");
-  //   if (!userNew) {
-  //     setOpenModal(true);
-  //   }
-  // }, []);
+  useEffect(() => {
+    const userNew = localStorage.getItem("GettingStarted");
+    if (!userNew) {
+      setOpenModal(true);
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   if (isInitialStateResolved) {
-  //     if (typeof value == "string") {
-  //       if (value !== "") {
-  //         setCardData(JSON.parse(value));
-  //       }
-  //     } else {
-  //       setCardData(value);
-  //     }
-  //   }
-  // }, [isInitialStateResolved, value]);
+  useEffect(() => {
+    if (isInitialStateResolved) {
+      if (typeof value == "string") {
+        if (value !== "") {
+          setCardData(JSON.parse(value));
+        }
+      } else {
+        setCardData(value);
+      }
+    }
+  }, [isInitialStateResolved, value]);
 
-  // useEffect(() => {
-  //   const handleMessage = (request, sender, sendResponse) => {
-  //     if (request.action === "addTextToList") {
-  //       const newText = request.payload.text;
-  //       setCardData((prevList) => [
-  //         ...prevList,
-  //         {
-  //           date: new Date(),
-  //           data: newText,
-  //         },
-  //       ]);
-  //     }
-  //   };
-  //   window.hljs.highlightAll();
-  //   window.chrome.runtime.onMessage.addListener(handleMessage);
+  useEffect(() => {
+    const handleMessage = (request, sender, sendResponse) => {
+      if (request.action === "addTextToList") {
+        const newText = request.payload.text;
+        setCardData((prevList) => [
+          ...prevList,
+          {
+            date: new Date(),
+            data: newText,
+          },
+        ]);
+      }
+    };
+    window.hljs.highlightAll();
+    window.chrome.runtime.onMessage.addListener(handleMessage);
 
-  //   return () => {
-  //     window.chrome.runtime.onMessage.removeListener(handleMessage);
-  //   };
-  // }, []);
+    return () => {
+      window.chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, []);
 
-  // useEffect(() => {
-  //   if (cardData.length > 0) {
-  //     try {
-  //       setValue(JSON.stringify(cardData));
-  //     } catch (e) {}
-  //   }
-  // }, [cardData, setValue]);
+  useEffect(() => {
+    if (cardData.length > 0) {
+      try {
+        setValue(JSON.stringify(cardData));
+      } catch (e) {}
+    }
+  }, [cardData, setValue]);
 
   const importBookmark = useCallback(async () => {
     setLoading(true);
@@ -223,6 +223,8 @@ function App() {
   const handleaddCard = useCallback(
     async (content) => {
       let allContent = content;
+      console.log(content);
+      console.log("<<<<<<<<<<<<<<<<content>>>>>>>>>>>>>>>>");
       let links = extractFullLinks(allContent);
       if (links && links.length > 0) {
         console.log("links", links);

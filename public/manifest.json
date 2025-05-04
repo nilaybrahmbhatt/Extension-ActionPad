@@ -3,11 +3,10 @@
   "name": "WritingPad - Quick Notes, Powerful Results",
   "version": "1.0",
   "description": "Just open a new tab and throw in your tasks, notes, links, and images",
-  "permissions": ["storage", "bookmarks", "contextMenus", "scripting"],
+  "permissions": ["storage", "bookmarks", "contextMenus"],
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "host_permissions": ["https://www.developer.chrome.com/*"],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "background": {
     "service_worker": "eventPage.js"

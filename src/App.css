@@ -304,3 +304,33 @@ ul {
 .hljs-strong {
   font-weight: bold;
 }
+
+
+ol li {
+  list-style: none;
+  position: relative;
+  padding-left: 2em;
+  cursor: pointer;
+}
+
+ol li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.2em;
+  width: 1em;
+  height: 1em;
+  border: 2px solid #555;
+  border-radius: 3px;
+  background-color: #fff;
+}
+
+ol li[data-list="checked"]::before {
+  content: "✓";
+  color: white;
+  font-size: 0.8em;
+  text-align: center;
+  line-height: 1em;
+  background-color: #007bff;
+  border-color: #007bff;
+}
